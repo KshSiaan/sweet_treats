@@ -17,25 +17,29 @@ import React from "react";
 
 export default function Page() {
   return (
-    <main className="bg-gradient-to-tl from-[#17a14c41] to-[#8d37e434] h-dvh w-dvw flex justify-center items-center">
-      <Card className="min-w-1/3 aspect-square flex flex-col justify-center items-center gap-12">
+    <main className="bg-primary h-dvh w-dvw flex justify-center items-center">
+      <Card className="min-w-1/3  text-background bg-background/40 border-background/40 shadow-white!  aspect-square flex flex-col justify-center items-center gap-12">
         <CardHeader className="px-12 w-full ">
-          <CardTitle className="text-4xl! text-center">
-            Admin Dashboard
+          <CardTitle className="text-5xl font-bold flex items-center gap-3 w-full justify-center">
+            <span className="text-background">New</span>{" "}
+            <span className="relative">
+              Password
+              <div className="w-full absolute -bottom-2 left-0 h-2 bg-gradient-to-r from-primary to-[#FFFFFF]" />
+            </span>
           </CardTitle>
-          <CardDescription className="text-center mt-2">
+          <CardDescription className="text-center mt-2 text-background">
             Secure access to your administration dashboard
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-12 w-full">
           <Label>New Password</Label>
-          <Input />
+          <Input placeholder="" className="bg-background text-foreground" />
           <Label>Confirm Password</Label>
-          <Input />
+          <Input placeholder="" className="bg-background text-foreground" />
         </CardContent>
         <CardFooter className="w-full flex flex-col gap-6">
           <Button className="w-2/3 mx-auto" asChild>
-            <Link href={"/admin"}>Reset Password</Link>
+            <Link href={"/login"}>Reset Password</Link>
           </Button>
         </CardFooter>
       </Card>
