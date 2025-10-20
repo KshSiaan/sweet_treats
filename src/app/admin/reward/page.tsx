@@ -36,13 +36,13 @@ export default function Page() {
     <section>
       <div className="w-full flex justify-between items-center py-4">
         <h2 className="mb-6 text-2xl font-semibold text-primary">
-          Subscription
+          Reward Point Earning Rules
         </h2>
         <Dialog>
           <DialogTrigger asChild>
             <Button>
               <PlusIcon />
-              Add Subscription
+              Add New Rule
             </Button>
           </DialogTrigger>
           <DialogContent className="p-0!">
@@ -50,11 +50,11 @@ export default function Page() {
               <DialogTitle>Add New Subscription</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 p-4!">
-              <Label>Plan name</Label>
+              <Label>Activity</Label>
               <Input placeholder="" />
-              <Label>Duration</Label>
+              <Label>Point per $1</Label>
               <Input placeholder="" />
-              <Label>Price</Label>
+              <Label>Multiplier</Label>
               <Input placeholder="" />
               <Label>Status</Label>
               <Select>
@@ -66,8 +66,6 @@ export default function Page() {
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
-              <Label>Benefits</Label>
-              <Textarea className="resize-none!" placeholder="" />
             </div>
             <DialogFooter className="p-4!">
               <DialogClose asChild>
@@ -88,16 +86,13 @@ export default function Page() {
             <TableHeader className="bg-accent ">
               <TableRow>
                 <TableHead className="text-primary! text-center">
-                  Plan Name
+                  Activity
                 </TableHead>
                 <TableHead className="text-primary! text-center">
-                  Duration
+                  Points per $1
                 </TableHead>
                 <TableHead className="text-primary! text-center">
-                  Price
-                </TableHead>
-                <TableHead className="text-primary! text-center">
-                  Active Subscriber
+                  Multiplier
                 </TableHead>
                 <TableHead className="text-primary! text-center">
                   Status
@@ -109,10 +104,9 @@ export default function Page() {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell className="text-center">Free</TableCell>
-                <TableCell className="text-center">-</TableCell>
-                <TableCell className="text-center">-</TableCell>
-                <TableCell className="text-center">45</TableCell>
+                <TableCell className="text-center">Transfers</TableCell>
+                <TableCell className="text-center">1 pts</TableCell>
+                <TableCell className="text-center">None</TableCell>
                 <TableCell className="text-center">
                   <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
                     <span
@@ -133,11 +127,11 @@ export default function Page() {
                         <DialogTitle>Edit Subscription</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 p-4!">
-                        <Label>Plan name</Label>
+                        <Label>Activity</Label>
                         <Input placeholder="" />
-                        <Label>Duration</Label>
+                        <Label>Point per $1</Label>
                         <Input placeholder="" />
-                        <Label>Price</Label>
+                        <Label>Multiplier</Label>
                         <Input placeholder="" />
                         <Label>Status</Label>
                         <Select>
@@ -149,8 +143,6 @@ export default function Page() {
                             <SelectItem value="inactive">Inactive</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Label>Benefits</Label>
-                        <Textarea className="resize-none!" placeholder="" />
                       </div>
                       <DialogFooter className="p-4!">
                         <DialogClose asChild>
