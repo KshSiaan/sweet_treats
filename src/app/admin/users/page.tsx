@@ -240,13 +240,27 @@ export default function Page() {
                     </DialogTrigger>
                     <DialogContent className="p-0!">
                       <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                        <DialogTitle>Edit Category</DialogTitle>
+                        <DialogTitle>Edit User details</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-6 p-4!">
-                        <Label>Category name</Label>
-                        <Input placeholder="" defaultValue={"Retail"} />
+                        <Label>Full name</Label>
+                        <Input placeholder="" />
+                        <Label>Email</Label>
+                        <Input placeholder="" />
+                        <Label>User Type </Label>
+                        <Select>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Customer</SelectItem>
+                            <SelectItem value="inactive">
+                              Business Owner
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Label>Status</Label>
-                        <Select defaultValue="active">
+                        <Select>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
@@ -255,14 +269,8 @@ export default function Page() {
                             <SelectItem value="inactive">Inactive</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Label>Description</Label>
-                        <Textarea
-                          defaultValue={
-                            "Stores selling products directly to consumers"
-                          }
-                          className="resize-none!"
-                          placeholder=""
-                        />
+                        <Label>Initial Notes</Label>
+                        <Textarea className="resize-none!" placeholder="" />
                       </div>
                       <DialogFooter className="p-4!">
                         <DialogClose asChild>

@@ -47,7 +47,7 @@ export default function Page() {
           </DialogTrigger>
           <DialogContent className="p-0!">
             <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-              <DialogTitle>Add New Subscription</DialogTitle>
+              <DialogTitle>Add New Rule</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 p-4!">
               <Label>Activity</Label>
@@ -74,7 +74,7 @@ export default function Page() {
                 </Button>
               </DialogClose>
               <Button className="px-12" size={"lg"}>
-                Save Subscription
+                Save rule
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -124,7 +124,7 @@ export default function Page() {
                     </DialogTrigger>
                     <DialogContent className="p-0!">
                       <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                        <DialogTitle>Edit Subscription</DialogTitle>
+                        <DialogTitle>Edit Rule</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 p-4!">
                         <Label>Activity</Label>
