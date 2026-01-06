@@ -1,13 +1,43 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import React from "react";
+import { getStoreFronts } from "@/lib/api/business";
+import { base_url } from "@/lib/utils";
+import { cookies } from "next/headers";
+import Image from "next/image";
 
-export default function Page() {
+import React, { Suspense } from "react";
+import DataController from "./data-controller";
+
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value || "";
+  const { data } = await getStoreFronts(token);
   return (
     <section>
+      {data?.video_path && (
+        <div className="mb-6 space-y-4">
+          <h3 className="text-2xl font-semibold text-primary ">Store Video</h3>
+          <video width="320" height="240" controls>
+            <source src={`${base_url}${data?.video_path}`} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
+      {data?.images.length > 0 && (
+        <div className="mb-6 space-y-4">
+          <h3 className="text-2xl font-semibold text-primary ">Store Images</h3>
+          <div className="w-full grid grid-cols-3 gap-6">
+            {data?.images.map((image, i) => (
+              <Image
+                className="w-full aspect-video rounded-lg shadow object-contain"
+                src={`${base_url}${image}`}
+                width={500}
+                height={500}
+                alt={`image${i}`}
+                key={i}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <h3 className="text-2xl font-semibold text-primary ">
           Store Front Customization
@@ -16,38 +46,9 @@ export default function Page() {
           Customize how your store appears to customers.
         </p>
       </div>
-      <Card>
-        <CardContent>
-          <h3 className="text-2xl font-semibold text-primary ">
-            Store Images (Up to 3)
-          </h3>
-          {Array(3)
-            .fill("")
-            .map((_, i) => (
-              <div className="space-y-4 mt-4" key={i + 1}>
-                <Label>Image {i + 1}</Label>
-                <Input type="file" />
-                <Input placeholder={`Caption for image ${i + 1}`} />
-              </div>
-            ))}
-        </CardContent>
-        <Separator />
-        <CardContent>
-          <h3 className="text-2xl font-semibold text-primary ">
-            Store Video (Max 30s)
-          </h3>
-          <div className="space-y-4 mt-4">
-            <Label>Video</Label>
-            <Input type="file" />
-            <Input placeholder={`Caption for video`} />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button className="px-12" size={"lg"}>
-            Save
-          </Button>
-        </CardFooter>
-      </Card>
+      <Suspense>
+        <DataController />
+      </Suspense>
     </section>
   );
 }

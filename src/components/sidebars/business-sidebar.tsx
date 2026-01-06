@@ -53,6 +53,11 @@ const data = {
 
     // 3. User Management (New addition/mapping)
     { name: "Store Fronts", url: `${prefix}/stores`, icon: StoreIcon }, // Use a standard Users/User Management Icon
+    {
+      name: "Categories",
+      url: `${prefix}/category`,
+      icon: ShapesIcon,
+    }, // Use a standard Users/User Management Icon
 
     // 4. Business Accounts -> Companies
     {
@@ -91,7 +96,7 @@ const data = {
       icon: UserPlus2Icon,
     },
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
-    { name: "Log Out", url: `${prefix}/logout`, icon: LogOutIcon },
+    { name: "Log Out", url: `/logout`, icon: LogOutIcon },
   ],
 };
 const princess = Princess_Sofia({

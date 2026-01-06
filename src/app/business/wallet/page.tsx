@@ -43,10 +43,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { getTransaction } from "@/lib/api/business";
 import { PlusIcon, SearchIcon } from "lucide-react";
+import { cookies } from "next/headers";
 import React from "react";
 
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value;
+  const data = await getTransaction(token!);
   return (
     <section>
       <div className="mb-6">
@@ -176,36 +180,38 @@ export default function Page() {
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="text-center font-semibold text-3xl text-primary">
-            $24,587.42
+            ${data?.data?.available_balance ?? "0.00"}
           </p>
           <div className="w-full flex justify-between items-center">
             <h3 className="text-2xl font-semibold text-primary">
               Recent Transactions
             </h3>
-            <Button>View all</Button>
+            {/* <Button>View all</Button> */}
           </div>
           <div className="divide-y border-t pt-6">
-            <div className="w-full p-y rounded-sm flex justify-between items-center">
-              <div className="flex gap-4 items-center justify-start">
-                <div className="h-full">
-                  <h4 className="font-bold text-lg">
-                    Deposit from Payment Gateway
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Today, 09:15 AM
+            {data?.data?.transactions_histories.data?.map((transaction) => (
+              <div className="w-full p-y rounded-sm flex justify-between items-center">
+                <div className="flex gap-4 items-center justify-start">
+                  <div className="h-full space-y-2 py-6">
+                    <h4 className="font-bold text-lg">
+                      {transaction?.message}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(transaction?.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="">
+                  <p className="text-xl font-semibold text-green-600">
+                    +${transaction?.amount}
                   </p>
                 </div>
               </div>
-              <div className="">
-                <p className="text-xl font-semibold text-green-600">
-                  +$1,250.00
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>
-      <h3 className="text-2xl font-semibold text-primary py-6">
+      {/* <h3 className="text-2xl font-semibold text-primary py-6">
         Employee Wallets
       </h3>
       <Card className="pt-0! overflow-hidden">
@@ -291,7 +297,7 @@ export default function Page() {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+      </Card> */}
     </section>
   );
 }

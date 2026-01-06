@@ -10,8 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { cookies } from "next/headers";
+import { getFollowers } from "@/lib/api/business";
 
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value;
+  const data = await getFollowers(token!);
+
   return (
     <section>
       <div className="mb-6">
@@ -51,23 +56,38 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="text-center">John Smith</TableCell>
-                <TableCell className="text-center">
-                  robert.j@example.com
-                </TableCell>
-                <TableCell className="text-center">Jan 15, 2025</TableCell>
-                <TableCell className="text-center">12</TableCell>
-                <TableCell className="text-center">
-                  <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                    <span
-                      className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                      aria-hidden="true"
-                    />
-                    Active
-                  </Badge>
-                </TableCell>
-              </TableRow>
+              {data?.data.map((follower) => (
+                <TableRow>
+                  <TableCell className="text-center">
+                    {follower.customer.full_name}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {follower.customer.email}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {new Date(follower.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {follower.order_count}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                      {follower?.customer?.status === "Active" ? (
+                        <span
+                          className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <span
+                          className="size-1.5 rounded-full bg-red-600 dark:bg-red-400"
+                          aria-hidden="true"
+                        />
+                      )}
+                      {follower?.customer?.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>
