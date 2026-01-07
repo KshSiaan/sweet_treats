@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/base";
-import { howl } from "../utils";
-import { BusinessMapType, CategoryType, FollowerType, ProductType, StoreFrontType, TransactionType } from "@/types/dbs/business";
+import { base_api, base_url, howl } from "../utils";
+import { BusinessMapType, CategoryType, EmployeeType, FollowerType, ProductType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
 
 export async function getStoreFronts(
   token: string
@@ -40,10 +40,152 @@ export async function updateBusinessMap(
   return howl(`/business/create-or-update-map`, { token, body, method: "POST" });
 }
 
-
-
 export async function getProducts(
   token: string
 ): Promise<ApiResponse<ProductType[]>> {
   return howl(`/business/product`, { token });
+}
+export async function addProduct(
+  token: string,
+  body: FormData
+): Promise<ApiResponse<ProductType[]>> {
+  const res = await fetch(`${base_url}${base_api}/business/product`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Note: Don't set Content-Type for FormData; the browser handles it automatically
+      accept: "application/json",
+    },
+    body,
+  });
+  // if (!res.ok) {
+    //   throw new Error(`HTTP ${res.status}`);
+    // }
+    const data = await res.json();
+    return data;
+  }
+  
+  export async function updateProduct(
+    token: string,
+    body: FormData,
+    id: string
+  ): Promise<ApiResponse<ProductType[]>> {
+    const res = await fetch(`${base_url}${base_api}/business/product/${id}?_method=PATCH`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Don't set Content-Type for FormData; the browser handles it automatically
+        accept: "application/json",
+    },
+    body,
+  });
+  
+  const data = await res.json();
+  return data;
+  
+}
+
+export async function deleteProduct(
+  token: string,
+  id: string
+): Promise<ApiResponse<ProductType>> {
+  return howl(`/business/product/${id}`, { token ,method: "DELETE" });
+}
+export async function getStocks(
+  token: string,
+): Promise<ApiResponse<StockType[]>> {
+  return howl(`/business/get-stock-requests`, { token });
+}
+export async function restockApi(
+  token: string,
+  id: string,
+  restockAmm: string
+): Promise<ApiResponse<StockType>> {
+  return howl(`/business/stock-update/${id}?restock_quantity=${restockAmm}`, { token,method: "PATCH" });
+}
+
+
+
+export async function getEmployeesApi(
+  token: string,
+): Promise<ApiResponse<EmployeeType[]>> {
+  return howl(`/business/employee`, { token });
+}
+export async function addEmployee(
+  token: string,
+  body:{
+    full_name:string,
+    email:string,
+    address:string,
+    status:string,
+  }
+): Promise<ApiResponse<EmployeeType>> {
+  return howl(`/business/employee`, { token, body, method: "POST" });
+}
+export async function updateEmployee(
+  token: string,
+  id:string,
+  body:{
+    full_name:string,
+    status:string,
+  }
+): Promise<ApiResponse<EmployeeType>> {
+  return howl(`/business/employee/${id}?_method=PATCH`, { token, body: {
+    full_name: body.full_name,
+    status: body.status
+  }, method: "POST" });
+}
+export async function deleteEmployeeApi(
+  token: string,
+  id: string
+): Promise<ApiResponse<EmployeeType>> {
+  return howl(`/business/employee/${id}`, { token ,method: "DELETE" });
+}
+
+
+
+export async function getSalary(
+  token: string,
+): Promise<ApiResponse<salaryType[]>> {
+  return howl(`/business/salary`, { token });
+}
+
+export async function addSalary(
+  token: string,
+  body:{
+    full_name:string,
+    email:string,
+    address:string,
+    status:string,
+  }
+): Promise<ApiResponse<salaryType>> {
+  return howl(`/business/salary`, { token, body, method: "POST" });
+}
+
+export async function updateSalary(
+  token: string,
+  id:string,
+  body:{
+    full_name:string,
+    status:string,
+  }
+): Promise<ApiResponse<salaryType>> {
+  return howl(`/business/salary/${id}?_method=PATCH`, { token, body: {
+    full_name: body.full_name,
+    status: body.status
+  }, method: "POST" });
+}
+
+export async function deleteSalary(
+  token: string,
+  id: string
+): Promise<ApiResponse<salaryType>> {
+  return howl(`/business/salary/${id}`, { token ,method: "DELETE" });
+}
+
+export async function confirmSalary(
+  token: string,
+  id:string,
+): Promise<ApiResponse<salaryType>> {
+  return howl(`/business/confirm-salary/${id}`, { token, method: "PATCH" });
 }

@@ -20,7 +20,7 @@ import {
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addProduct, getCategories } from "@/lib/api/business";
+import { addProduct, getCategories, updateProduct } from "@/lib/api/business";
 import { useCookies } from "react-cookie";
 
 import { useForm } from "react-hook-form";
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ProductType } from "@/types/dbs/business";
 // ----- Zod Schema -----
 const addItemSchema = z.object({
   business_category_id: z.string().min(1, "Category is required"),
@@ -48,7 +49,7 @@ const addItemSchema = z.object({
 
 type AddItemForm = z.infer<typeof addItemSchema>;
 
-export default function AddProd() {
+export default function EditProd({ data: currData }: { data: ProductType }) {
   const [{ token }] = useCookies(["token"]);
   const navig = useRouter();
   const { data } = useQuery({
@@ -63,19 +64,19 @@ export default function AddProd() {
   const { register, handleSubmit, watch, setValue } = useForm<AddItemForm>({
     resolver: zodResolver(addItemSchema),
     defaultValues: {
-      product_name: "",
-      business_category_id: "",
-      product_category_id: "",
-      stock: "",
-      price: "",
-      unit: "",
-      description: "",
+      product_name: currData.product_name ?? "",
+      business_category_id: String(currData.business_category_id),
+      product_category_id: String(currData.product_category_id),
+      stock: String(currData.stock),
+      price: String(currData.price),
+      unit: currData.unit ?? "",
+      description: currData.description ?? "",
     },
   });
   const { mutate, isPending } = useMutation({
-    mutationKey: ["add-product"],
+    mutationKey: ["edit-product"],
     mutationFn: (body: FormData) => {
-      return addProduct(token, body);
+      return updateProduct(token, body, String(currData.id));
     },
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
@@ -109,14 +110,12 @@ export default function AddProd() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon /> Add Item
-        </Button>
+        <Button variant={"outline"}>Edit</Button>
       </DialogTrigger>
 
       <DialogContent className="p-0!">
         <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-          <DialogTitle>Add New Item</DialogTitle>
+          <DialogTitle>Edit Item</DialogTitle>
         </DialogHeader>
 
         <form className="space-y-4 px-6 pb-6" onSubmit={handleSubmit(onSubmit)}>
@@ -222,7 +221,7 @@ export default function AddProd() {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isPending}>
-              Add Item
+              Update
             </Button>
           </DialogFooter>
         </form>
