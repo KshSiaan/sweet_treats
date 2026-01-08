@@ -158,3 +158,22 @@ export interface EmployeeType {
     avatar_url: string
   }
 }
+
+export interface PromotionType {
+    id: number
+    business_category_id: number
+    business_id: number
+    title: string
+    image: string
+    type: string
+    discount_value: number
+    starting_date: string
+    ending_date: string
+    use_code: any
+    description: string
+    target_category_id: number
+    is_specific: boolean
+    target_products: any
+    created_at: string
+    updated_at: string
+  }

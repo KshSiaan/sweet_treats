@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/base";
 import { base_api, base_url, howl } from "../utils";
-import { BusinessMapType, CategoryType, EmployeeType, FollowerType, ProductType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
+import { BusinessMapType, CategoryType, EmployeeType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
 
 export async function getStoreFronts(
   token: string
@@ -153,10 +153,10 @@ export async function getSalary(
 export async function addSalary(
   token: string,
   body:{
-    full_name:string,
-    email:string,
-    address:string,
-    status:string,
+    employee_id:string|number,
+    month:string,
+    year:string,
+    amount:string,
   }
 ): Promise<ApiResponse<salaryType>> {
   return howl(`/business/salary`, { token, body, method: "POST" });
@@ -166,14 +166,13 @@ export async function updateSalary(
   token: string,
   id:string,
   body:{
-    full_name:string,
-    status:string,
+    employee_id:string|number,
+    month:string,
+    year:string,
+amount:string,
   }
 ): Promise<ApiResponse<salaryType>> {
-  return howl(`/business/salary/${id}?_method=PATCH`, { token, body: {
-    full_name: body.full_name,
-    status: body.status
-  }, method: "POST" });
+  return howl(`/business/salary/${id}?_method=PATCH`, { token, body, method: "POST" });
 }
 
 export async function deleteSalary(
@@ -189,3 +188,50 @@ export async function confirmSalary(
 ): Promise<ApiResponse<salaryType>> {
   return howl(`/business/confirm-salary/${id}`, { token, method: "PATCH" });
 }
+
+
+export async function getPromotions(
+  token: string,
+): Promise<ApiResponse<PromotionType[]>> {
+  return howl(`/business/promotion`, { token });
+}
+
+export async function addPromotion(
+  token: string,
+  body:FormData
+): Promise<ApiResponse<PromotionType[]>> {
+  const res = await fetch(`${base_url}${base_api}/business/promotion`, {
+    method: "POST",
+    headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Don't set Content-Type for FormData; the browser handles it automatically
+        accept: "application/json",
+      },
+      body,
+    });
+    const data = await res.json();
+    return data;
+  }
+  export async function editPromotion(
+    token: string,
+    id:string,
+    body:FormData
+  ): Promise<ApiResponse<PromotionType>> {
+    const res = await fetch(`${base_url}${base_api}/business/promotion/${id}?_method=PATCH`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Don't set Content-Type for FormData; the browser handles it automatically
+        accept: "application/json",
+      },
+      body,
+    });
+    const data = await res.json();
+    return data;
+  }
+  export async function deletePromotion(
+    token: string,
+    id: string
+  ): Promise<ApiResponse<PromotionType[]>> {
+    return howl(`/business/promotion/${id}`, { token, method: "DELETE" });
+  }

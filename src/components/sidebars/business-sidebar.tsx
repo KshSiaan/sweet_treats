@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import {
+  BellIcon,
   BookCopyIcon,
   ChartNoAxesCombined,
   ClipboardCheckIcon,
@@ -95,6 +96,7 @@ const data = {
       url: `${prefix}/followers`,
       icon: UserPlus2Icon,
     },
+    { name: "Notification", url: `${prefix}/notification`, icon: BellIcon },
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
     { name: "Log Out", url: `/logout`, icon: LogOutIcon },
   ],

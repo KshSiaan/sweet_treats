@@ -32,6 +32,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getSalary } from "@/lib/api/business";
 import { useCookies } from "react-cookie";
+import AddSalary from "./add-salary";
+import SalaryController from "./salary-controller";
 export default function Salary() {
   const [{ token }] = useCookies(["token"]);
   const { data, isPending } = useQuery({
@@ -47,7 +49,7 @@ export default function Salary() {
         <h3 className="text-2xl font-semibold text-primary py-6">
           Employee Wallets
         </h3>
-        <Button>Add Salary</Button>
+        <AddSalary />
       </div>
       <Card className="pt-0! overflow-hidden">
         <CardContent className="px-0!">
@@ -88,19 +90,17 @@ export default function Salary() {
                           className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
                           aria-hidden="true"
                         />
-                        Active
+                        {item?.status}
                       </Badge>
                     ) : (
                       <Badge className="rounded-full border-none bg-yellow-600/10 text-yellow-600 focus-visible:ring-yellow-600/20 focus-visible:outline-none dark:bg-yellow-400/10 dark:text-yellow-400 dark:focus-visible:ring-yellow-400/40 [a&]:hover:bg-yellow-600/5 dark:[a&]:hover:bg-yellow-400/5">
                         <span className="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400" />
-                        Pending
+                        {item?.status}
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-center space-x-4">
-                    <Button>View</Button>
-                    <Button variant={"outline"}>Edit</Button>
-                    <Button variant={"destructive"}>Delete</Button>
+                  <TableCell className="text-start space-x-4 w-[20dvw]">
+                    <SalaryController data={item} />
                   </TableCell>
                 </TableRow>
               ))}
