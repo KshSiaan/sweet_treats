@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/types/base";
+import { ApiResponse, Paginator } from "@/types/base";
 import { base_api, base_url, howl } from "../utils";
 import { BusinessMapType, CategoryType, EmployeeType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
 
@@ -42,8 +42,8 @@ export async function updateBusinessMap(
 
 export async function getProducts(
   token: string
-): Promise<ApiResponse<ProductType[]>> {
-  return howl(`/business/product`, { token });
+): Promise<ApiResponse<Paginator<ProductType[]>>> {
+  return howl(`/business/product?per_page=50`, { token });
 }
 export async function addProduct(
   token: string,

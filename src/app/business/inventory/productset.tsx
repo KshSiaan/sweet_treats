@@ -47,7 +47,7 @@ export default function ProductSet() {
           </InputGroupAddon>
         </InputGroup>
         <div className="divide-y">
-          {data?.data?.map((item) => (
+          {data?.data?.data.map((item) => (
             <div
               className="w-full p-2 rounded-sm flex justify-between items-center"
               key={item.id}

@@ -38,7 +38,7 @@ export default function Promos() {
           <div>Loading...</div>
         ) : (
           data?.data?.map((item) => (
-            <Card className="pt-0! overflow-hidden">
+            <Card className="pt-0! overflow-hidden" key={item.id}>
               <CardHeader className="flex justify-between items-center bg-accent py-4">
                 <CardTitle className="text-2xl font-semibold text-primary">
                   {item?.title}

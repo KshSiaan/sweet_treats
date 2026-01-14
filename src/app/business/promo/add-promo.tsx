@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -26,7 +27,29 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { PlusIcon, UploadCloudIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dropzone,
+  DropzoneContent,
+  DropzoneEmptyState,
+} from "@/components/ui/shadcn-io/dropzone";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useCookies } from "react-cookie";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "@/lib/api/business";
+import { Checkbox } from "@/components/ui/checkbox";
 export default function AddPromo() {
+  const [{ token }] = useCookies(["token"]);
+  const [isSpecificProduct, setIsSpecificProduct] = useState<boolean>(false);
+  const { data, isPending } = useQuery({
+    queryKey: ["products", token],
+    queryFn: () => {
+      return getProducts(token);
+    },
+    enabled: !!token || !!isSpecificProduct,
+  });
+  const [files, setFiles] = useState<File[] | undefined>();
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const handleDrop = (files: File[]) => setFiles(files);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -35,32 +58,31 @@ export default function AddPromo() {
           Create Promotion
         </Button>
       </DialogTrigger>
-      <DialogContent className="p-0!">
+      <DialogContent className="p-0! ">
         <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
           <DialogTitle>Create Promotion</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 px-6 pb-6">
+        <div className="space-y-4 px-6 pb-6 max-h-[80dvh] overflow-y-auto">
           <Label>Promotion Title</Label>
           <Input placeholder="Enter promotion title" />
           <Label>Promotion Image</Label>
           <div className="w-full border border-dashed rounded-lg flex justify-center items-center hover:bg-accent transition-colors">
             <label htmlFor="imgSel" className="cursor-pointer h-full w-full">
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant={"icon"} className="text-primary">
-                    <UploadCloudIcon />
-                  </EmptyMedia>
-                  <EmptyTitle className="text-sm">
-                    Click to upload promotion image
-                  </EmptyTitle>
-                </EmptyHeader>
-              </Empty>
+              <Dropzone
+                accept={{ "image/*": [] }}
+                onDrop={handleDrop}
+                src={files}
+                multiple
+              >
+                <DropzoneEmptyState />
+                <DropzoneContent />
+              </Dropzone>
               <input type="file" className="hidden" id="imgSel" />
             </label>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-4">
-              <Label>Discount type</Label>
+              <Label>Promotion type</Label>
               <Select>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select type" />
@@ -85,8 +107,6 @@ export default function AddPromo() {
               <Input type="date" />
             </div>
           </div>
-          <Label>Description</Label>
-          <Textarea placeholder="Enter promotion description" />
           <Label>Target Category</Label>
           <Select>
             <SelectTrigger className="w-full">
@@ -96,6 +116,82 @@ export default function AddPromo() {
               <SelectItem value="1">Electronics</SelectItem>
             </SelectContent>
           </Select>
+          <Label>Do you want to make an offer on a specific product?</Label>
+          <RadioGroup
+            className="flex-row flex"
+            onValueChange={(value) => setIsSpecificProduct(value === "yes")}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem
+                value="yes"
+                id="yes"
+                className="border-primary border-2"
+              />
+              <Label htmlFor="yes">Yes</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem
+                value="no"
+                id="no"
+                className="border-primary border-2"
+              />
+              <Label htmlFor="no">No</Label>
+            </div>
+          </RadioGroup>
+          {isSpecificProduct && (
+            <div className="w-full">
+              <Label>Select Product</Label>
+              {isPending ? (
+                <div>Loading...</div>
+              ) : data?.data?.data?.length === 0 ? (
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia>
+                      <UploadCloudIcon className="w-12 h-12 text-muted-foreground" />
+                    </EmptyMedia>
+                    <EmptyTitle>No Products Found</EmptyTitle>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                <div className="">
+                  {data?.data?.data?.map((product) => (
+                    <div
+                      className="flex flex-row justify-start items-center gap-2 border-b last:border-0"
+                      key={product.id}
+                    >
+                      <Checkbox
+                        checked={selectedProducts.includes(String(product.id))}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedProducts([
+                              ...selectedProducts,
+                              String(product.id),
+                            ]);
+                          } else {
+                            setSelectedProducts(
+                              selectedProducts.filter(
+                                (id) => id !== String(product.id)
+                              )
+                            );
+                          }
+                        }}
+                      />
+                      <div className="p-4 ">
+                        <h4 className="font-semibold text-primary">
+                          {product.product_name}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          ${product.price}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <Label>Description</Label>
+          <Textarea placeholder="Enter promotion description" />
         </div>
         <DialogFooter className="p-4">
           <DialogClose asChild>
