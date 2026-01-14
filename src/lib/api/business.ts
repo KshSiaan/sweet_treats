@@ -1,6 +1,6 @@
 import { ApiResponse, Paginator } from "@/types/base";
 import { base_api, base_url, howl } from "../utils";
-import { BusinessMapType, CategoryType, EmployeeType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
+import { BusinessMapType, CategoryType, EmployeeType, EventType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
 
 export async function getStoreFronts(
   token: string
@@ -199,7 +199,7 @@ export async function getPromotions(
 export async function addPromotion(
   token: string,
   body:FormData
-): Promise<ApiResponse<PromotionType[]>> {
+): Promise<ApiResponse<PromotionType>> {
   const res = await fetch(`${base_url}${base_api}/business/promotion`, {
     method: "POST",
     headers: {
@@ -232,6 +232,55 @@ export async function addPromotion(
   export async function deletePromotion(
     token: string,
     id: string
-  ): Promise<ApiResponse<PromotionType[]>> {
+  ): Promise<ApiResponse<PromotionType>> {
     return howl(`/business/promotion/${id}`, { token, method: "DELETE" });
+  }
+
+
+
+
+export async function getEvents(
+  token: string,
+): Promise<ApiResponse<EventType[]>> {
+  return howl(`/business/event`, { token });
+}
+
+export async function addEvent(
+  token: string,
+  body:FormData
+): Promise<ApiResponse<EventType>> {
+  const res = await fetch(`${base_url}${base_api}/business/event`, {
+    method: "POST",
+    headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Don't set Content-Type for FormData; the browser handles it automatically
+        accept: "application/json",
+      },
+      body,
+    });
+    const data = await res.json();
+    return data;
+  }
+  export async function editEvent(
+    token: string,
+    id:string,
+    body:FormData
+  ): Promise<ApiResponse<EventType>> {
+    const res = await fetch(`${base_url}${base_api}/business/event/${id}?_method=PATCH`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Don't set Content-Type for FormData; the browser handles it automatically
+        accept: "application/json",
+      },
+      body,
+    });
+    const data = await res.json();
+    return data;
+  }
+  export async function deleteEvent(
+    token: string,
+    id: string
+  ): Promise<ApiResponse<EventType>> {
+    return howl(`/business/event/${id}`, { token, method: "DELETE" });
   }

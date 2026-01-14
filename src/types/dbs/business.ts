@@ -177,3 +177,19 @@ export interface PromotionType {
     created_at: string
     updated_at: string
   }
+
+  export interface EventType {
+  id: number
+  business_id: number
+  title: string
+  image: string
+  type: string
+  event_date: string
+  starting_time: string
+  location: any
+  is_online: boolean
+  conference_link: string
+  description: string
+  created_at: string
+  updated_at: string
+}

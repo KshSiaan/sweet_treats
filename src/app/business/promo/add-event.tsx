@@ -35,7 +35,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCookies } from "react-cookie";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addPromotion, getProducts } from "@/lib/api/business";
+import { addEvent, addPromotion, getProducts } from "@/lib/api/business";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { z } from "zod";
@@ -45,18 +45,17 @@ import { toast } from "sonner";
 
 const schema = z.object({
   title: z.string().min(1),
-  business_category_id: z.string().min(1),
   type: z.string().min(1),
-  discount_value: z.string().min(1),
-  starting_date: z.string().min(1),
-  ending_date: z.string().min(1),
+  event_date: z.string().min(1),
+  starting_time: z.string().min(1),
   description: z.string().min(1),
-  target_category_id: z.string().min(1),
-  is_specific: z.boolean(),
+  conference_link: z.string().optional(),
+  is_online: z.boolean(),
+  location: z.string().optional(),
   target_products: z.array(z.string()).optional(),
 });
 
-export default function AddPromo() {
+export default function AddEvent() {
   const [{ token }] = useCookies(["token"]);
   const [files, setFiles] = useState<File[] | undefined>([]);
   const handleDrop = (files: File[]) => setFiles(files);
@@ -70,9 +69,9 @@ export default function AddPromo() {
     enabled: !!token,
   });
   const { mutate, isPending: adding } = useMutation({
-    mutationKey: ["add_promotion"],
+    mutationKey: ["add_event", token],
     mutationFn: (body: FormData) => {
-      return addPromotion(token, body);
+      return addEvent(token, body);
     },
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
@@ -85,33 +84,41 @@ export default function AddPromo() {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      business_category_id: "1",
       title: "",
-      type: "Discount",
-      discount_value: "",
-      starting_date: "",
-      ending_date: "",
+      type: "Workshop",
+      event_date: "",
+      starting_time: "",
       description: "",
-      target_category_id: "1",
-      is_specific: false,
+      is_online: false,
+      conference_link: "",
+      location: "",
       target_products: [],
     },
   });
+  const to12Hour = (time: string): string => {
+    if (!time) return "";
+
+    const [h, m] = time.split(":").map(Number);
+    const hour = h % 12 || 12;
+    const ampm = h >= 12 ? "PM" : "AM";
+
+    return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`;
+  };
 
   const onSubmit = (values: z.infer<typeof schema>) => {
     const formData = new FormData();
 
-    formData.append("business_category_id", values.business_category_id);
     formData.append("title", values.title);
     formData.append("type", values.type);
-    formData.append("discount_value", values.discount_value);
-    formData.append("starting_date", values.starting_date);
-    formData.append("ending_date", values.ending_date);
+    formData.append("event_date", values.event_date);
+    formData.append("starting_time", to12Hour(values.starting_time));
     formData.append("description", values.description);
-    formData.append("target_category_id", values.target_category_id);
-    formData.append("is_specific", values.is_specific ? "1" : "0");
+    formData.append("conference_link", values.conference_link ?? "");
+    formData.append("location", values.location ?? "");
 
-    if (values.is_specific && selectedProducts.length > 0) {
+    formData.append("is_online", values.is_online ? "1" : "0");
+
+    if (!values.is_online && selectedProducts.length > 0) {
       selectedProducts.forEach((id, index) => {
         formData.append(`target_products[${index}]`, id);
       });
@@ -132,26 +139,26 @@ export default function AddPromo() {
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
-          Create Promotion
+          Create Event
         </Button>
       </DialogTrigger>
 
       <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-          <DialogTitle>Create Promotion</DialogTitle>
+          <DialogTitle>Create Event</DialogTitle>
         </DialogHeader>
 
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 px-6 pb-6 max-h-[80dvh] overflow-y-auto"
         >
-          <Label>Promotion Title</Label>
+          <Label>Event Title</Label>
           <Input
             placeholder="Enter promotion title"
             {...form.register("title")}
           />
 
-          <Label>Promotion Image</Label>
+          <Label>Event Image</Label>
           <div className="w-full border border-dashed rounded-lg flex justify-center items-center hover:bg-accent transition-colors">
             <Dropzone
               accept={{ "image/*": [] }}
@@ -164,134 +171,66 @@ export default function AddPromo() {
             </Dropzone>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
             <div className="space-y-2">
-              <Label>Promotion type</Label>
-              <Select onValueChange={(v) => form.setValue("type", v)}>
+              <Label>Event type</Label>
+              <Select
+                onValueChange={(v) => form.setValue("type", v)}
+                defaultValue="Workshop"
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Discount">Discount</SelectItem>
-                  <SelectItem value="Coupon">Coupon</SelectItem>
-                  <SelectItem value="Voucher">Voucher</SelectItem>
-                  <SelectItem value="Buy1Get1">Buy 1 Get 1</SelectItem>
+                  <SelectItem value="Workshop">Workshop</SelectItem>
+                  <SelectItem value="Product Launch">Product Launch</SelectItem>
+                  <SelectItem value="Celebration">Celebration</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Discount Value</Label>
-              <Input
-                placeholder="e.g. 20"
-                {...form.register("discount_value")}
-              />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div>
+            <div className="space-y-2">
               <Label>Start Date</Label>
-              <Input type="date" {...form.register("starting_date")} />
+              <Input type="date" {...form.register("event_date")} />
             </div>
-            <div>
-              <Label>End Date</Label>
-              <Input type="date" {...form.register("ending_date")} />
+            <div className="space-y-2">
+              <Label>Starting Time</Label>
+              <Input type="time" {...form.register("starting_time")} />
             </div>
           </div>
 
-          <Label>Target Category</Label>
-          <Select
-            onValueChange={(v) => form.setValue("target_category_id", v)}
-            defaultValue="1"
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Retail</SelectItem>
-              <SelectItem value="2">Labor Service</SelectItem>
-              <SelectItem value="3">Food Service</SelectItem>
-              <SelectItem value="4">Rental</SelectItem>
-              <SelectItem value="5">Ecommerce</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Label>Do you want specific product offer?</Label>
+          <Label>Event Venue</Label>
           <RadioGroup
             className="flex gap-4"
             onValueChange={(v) => {
               const yes = v === "yes";
               setIsSpecificProduct(yes);
-              form.setValue("is_specific", yes);
+              form.setValue("is_online", !yes);
             }}
           >
             <div className="flex items-center gap-2">
               <RadioGroupItem value="yes" id="yes" className="border-primary" />
-              <Label htmlFor="yes">Yes</Label>
+              <Label htmlFor="yes">Offline</Label>
             </div>
 
             <div className="flex items-center gap-2">
               <RadioGroupItem value="no" id="no" className="border-primary" />
-              <Label htmlFor="no">No</Label>
+              <Label htmlFor="no">Online</Label>
             </div>
           </RadioGroup>
 
-          {isSpecificProduct && (
-            <div>
-              <Label>Select Product</Label>
-
-              {isPending ? (
-                <div>Loading...</div>
-              ) : data?.data?.data?.length === 0 ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <UploadCloudIcon className="w-12 h-12 text-muted-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>No Products Found</EmptyTitle>
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                data?.data?.data?.map((product: any) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center gap-2 border-b p-2"
-                  >
-                    <Checkbox
-                      checked={selectedProducts.includes(String(product.id))}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          const arr = [...selectedProducts, String(product.id)];
-                          setSelectedProducts(arr);
-                          form.setValue("target_products", arr);
-                        } else {
-                          const arr = selectedProducts.filter(
-                            (id) => id !== String(product.id)
-                          );
-                          setSelectedProducts(arr);
-                          form.setValue("target_products", arr);
-                        }
-                      }}
-                    />
-
-                    <div>
-                      <p className="font-semibold text-primary">
-                        {product.product_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        ${product.price}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
+          <Label>Conference Link</Label>
+          <Input
+            placeholder="Enter Conference Link"
+            {...form.register("conference_link")}
+          />
+          <Label>Location</Label>
+          <Input placeholder="Enter Location" {...form.register("location")} />
           <Label>Description</Label>
           <Textarea
-            placeholder="Enter promotion description"
+            placeholder="Enter event description"
             {...form.register("description")}
           />
 
@@ -302,7 +241,7 @@ export default function AddPromo() {
               </Button>
             </DialogClose>
             <Button type="submit" disabled={adding}>
-              {adding ? "Creating..." : "Create Promotion"}
+              {adding ? "Creating..." : "Create Event"}
             </Button>
           </DialogFooter>
         </form>

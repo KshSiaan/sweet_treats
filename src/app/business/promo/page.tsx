@@ -3,6 +3,7 @@ import Image from "next/image";
 import React from "react";
 import Promos from "./promos";
 import { Tabs, TabsList, TabsTrigger } from "@/components/custom-tabs";
+import Events from "./events";
 
 export default function Page() {
   const [activeTab, setActiveTab] = React.useState("1");
@@ -25,7 +26,7 @@ export default function Page() {
         </Tabs>
       </div>
       {activeTab === "1" && <Promos />}
-      {/* {activeTab === "2" && <Stock />} */}
+      {activeTab === "2" && <Events />}
       {/* <Promos /> */}
     </section>
   );
