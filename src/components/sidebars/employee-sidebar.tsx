@@ -5,6 +5,7 @@ import {
   CoinsIcon,
   GiftIcon,
   LayoutDashboardIcon,
+  LogOutIcon,
   Settings2,
   SettingsIcon,
   TargetIcon,
@@ -37,7 +38,7 @@ const data = {
   projects: [
     { name: "Dashboard", url: `${prefix}`, icon: LayoutDashboardIcon },
     { name: "Inventory", url: `${prefix}/inventory`, icon: TargetIcon },
-    { name: "Purchasing", url: `${prefix}/purchasing`, icon: CoinsIcon }, // Use a standard Users/User Management Icon
+    { name: "POS System", url: `${prefix}/pos`, icon: CoinsIcon }, // Use a standard Users/User Management Icon
     {
       name: "Employee Wallet",
       url: `${prefix}/employee-wallet`,
@@ -50,6 +51,7 @@ const data = {
     },
 
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
+    { name: "Log Out", url: `/logout`, icon: LogOutIcon },
   ],
 };
 const princess = Princess_Sofia({

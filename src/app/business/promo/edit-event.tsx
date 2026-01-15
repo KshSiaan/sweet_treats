@@ -35,7 +35,12 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCookies } from "react-cookie";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addEvent, addPromotion, getProducts } from "@/lib/api/business";
+import {
+  addEvent,
+  addPromotion,
+  editEvent,
+  getProducts,
+} from "@/lib/api/business";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { z } from "zod";
@@ -43,6 +48,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { toDDMMYYYY } from "@/lib/funcs";
+import { EventType } from "@/types/dbs/business";
 
 const schema = z.object({
   title: z.string().min(1),
@@ -56,24 +62,16 @@ const schema = z.object({
   target_products: z.array(z.string()).optional(),
 });
 
-export default function AddEvent() {
+export default function EditEvent({ data: eve }: { data: EventType }) {
   const [{ token }] = useCookies(["token"]);
   const qcl = useQueryClient();
   const [files, setFiles] = useState<File[] | undefined>([]);
-  const handleDrop = (files: File[]) => setFiles(files);
-
   const [isSpecificProduct, setIsSpecificProduct] = useState(false);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-
-  const { data, isPending } = useQuery({
-    queryKey: ["products", token],
-    queryFn: () => getProducts(token),
-    enabled: !!token,
-  });
+  const handleDrop = (files: File[]) => setFiles(files);
   const { mutate, isPending: adding } = useMutation({
-    mutationKey: ["add_event", token],
+    mutationKey: ["edit_event", token],
     mutationFn: (body: FormData) => {
-      return addEvent(token, body);
+      return editEvent(token, String(eve.id), body);
     },
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
@@ -87,14 +85,14 @@ export default function AddEvent() {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: "",
-      type: "Workshop",
-      event_date: "",
-      starting_time: "",
-      description: "",
-      is_online: false,
-      conference_link: "",
-      location: "",
+      title: eve.title ?? "",
+      type: eve.type ?? "Workshop",
+      event_date: eve.event_date ?? "",
+      starting_time: eve.starting_time ?? "",
+      description: eve.description ?? "",
+      is_online: eve.is_online ?? false,
+      conference_link: eve.conference_link ?? "",
+      location: eve.location ?? "",
       target_products: [],
     },
   });
@@ -121,12 +119,6 @@ export default function AddEvent() {
 
     formData.append("is_online", values.is_online ? "1" : "0");
 
-    if (!values.is_online && selectedProducts.length > 0) {
-      selectedProducts.forEach((id, index) => {
-        formData.append(`target_products[${index}]`, id);
-      });
-    }
-
     if (files && files.length > 0) {
       formData.append("image", files[0]);
     }
@@ -140,15 +132,12 @@ export default function AddEvent() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon />
-          Create Event
-        </Button>
+        <Button variant={"outline"}>Edit</Button>
       </DialogTrigger>
 
       <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-          <DialogTitle>Create Event</DialogTitle>
+          <DialogTitle>Edit Event</DialogTitle>
         </DialogHeader>
 
         <form
@@ -244,7 +233,7 @@ export default function AddEvent() {
               </Button>
             </DialogClose>
             <Button type="submit" disabled={adding}>
-              {adding ? "Creating..." : "Create Event"}
+              {adding ? "Updating..." : "Update Event"}
             </Button>
           </DialogFooter>
         </form>

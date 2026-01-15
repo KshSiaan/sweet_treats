@@ -8,17 +8,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { BusinessDashboardType } from "@/types/dbs/business";
 
 export const description = "A bar chart";
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
 
 const chartConfig = {
   desktop: {
@@ -27,7 +19,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartBarDefault() {
+export function ChartBarDefault({
+  data,
+}: {
+  data?: BusinessDashboardType["sales_performance"];
+}) {
+  const chartData = [
+    { month: "E-Commerce", desktop: data?.ecommerce_total_sales },
+    { month: "Rental", desktop: data?.rental_total_sales },
+    { month: "Retail", desktop: data?.retail_total_sales },
+    { month: "Labour", desktop: data?.labor_Service_total_sales },
+    { month: "Food", desktop: data?.food_Service_total_sales },
+    // { month: "June", desktop:  },
+  ];
   return (
     <ChartContainer config={chartConfig} className="h-[400px] w-full">
       <BarChart accessibilityLayer data={chartData}>

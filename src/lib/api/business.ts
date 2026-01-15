@@ -1,7 +1,16 @@
 import { ApiResponse, Paginator } from "@/types/base";
 import { base_api, base_url, howl } from "../utils";
-import { BusinessMapType, CategoryType, EmployeeType, EventType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
+import { BusinessDashboardType, BusinessMapType, CategoryType, EmployeeType, EventType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
 
+
+
+
+
+export async function getBusinessDashboard(
+  token: string
+): Promise<ApiResponse<BusinessDashboardType>> {
+  return howl(`/business/get-business-dashboard-info`, { token });
+}
 export async function getStoreFronts(
   token: string
 ): Promise<ApiResponse<StoreFrontType>> {

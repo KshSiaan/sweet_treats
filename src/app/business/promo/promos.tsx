@@ -16,6 +16,7 @@ import EditPromo from "./edit-promo";
 import { useCookies } from "react-cookie";
 import { getPromotions } from "@/lib/api/business";
 import { base_url } from "@/lib/utils";
+import DelPromo from "./del-promo";
 export default function Promos() {
   const [{ token }] = useCookies(["token"]);
   const { data, isPending } = useQuery({
@@ -78,10 +79,8 @@ export default function Promos() {
                 </div>
               </CardContent>
               <CardFooter className="space-x-4">
-                <EditPromo />
-                <Button className="px-12" variant={"destructive"}>
-                  End Promotion
-                </Button>
+                <EditPromo data={item} />
+                <DelPromo data={item} />
               </CardFooter>
             </Card>
           ))

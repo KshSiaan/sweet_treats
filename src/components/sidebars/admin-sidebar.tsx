@@ -5,6 +5,7 @@ import {
   CoinsIcon,
   GiftIcon,
   LayoutDashboardIcon,
+  LogOutIcon,
   Settings2,
   SettingsIcon,
   ShapesIcon,
@@ -61,6 +62,7 @@ const data = {
       icon: BookCopyIcon,
     },
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
+    { name: "Log Out", url: `/logout`, icon: LogOutIcon },
   ],
 };
 const princess = Princess_Sofia({

@@ -9,12 +9,18 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebars/admin-sidebar";
 import { BellIcon, SearchIcon } from "lucide-react";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
-export default function Layout({
+export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = (await cookies()).get("token")?.value;
+  if (!token) {
+    return notFound();
+  }
   return (
     <SidebarProvider className=" rounded-r-2xl border-0">
       <AppSidebar />

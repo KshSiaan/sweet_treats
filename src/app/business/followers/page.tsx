@@ -57,7 +57,7 @@ export default async function Page() {
             </TableHeader>
             <TableBody>
               {data?.data.map((follower) => (
-                <TableRow>
+                <TableRow key={follower.id}>
                   <TableCell className="text-center">
                     {follower.customer.full_name}
                   </TableCell>

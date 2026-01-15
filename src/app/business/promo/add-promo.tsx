@@ -34,14 +34,16 @@ import {
 } from "@/components/ui/shadcn-io/dropzone";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCookies } from "react-cookie";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { addPromotion, getProducts } from "@/lib/api/business";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addPromotion, getCategories, getProducts } from "@/lib/api/business";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { toDDMMYYYY } from "@/lib/funcs";
+import { BusinessCategory } from "@/types/dbs/business";
 
 const schema = z.object({
   title: z.string().min(1),
@@ -60,7 +62,7 @@ export default function AddPromo() {
   const [{ token }] = useCookies(["token"]);
   const [files, setFiles] = useState<File[] | undefined>([]);
   const handleDrop = (files: File[]) => setFiles(files);
-
+  const qcl = useQueryClient();
   const [isSpecificProduct, setIsSpecificProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -69,6 +71,7 @@ export default function AddPromo() {
     queryFn: () => getProducts(token),
     enabled: !!token,
   });
+
   const { mutate, isPending: adding } = useMutation({
     mutationKey: ["add_promotion"],
     mutationFn: (body: FormData) => {
@@ -79,6 +82,7 @@ export default function AddPromo() {
     },
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
+      qcl.invalidateQueries({ queryKey: ["promotions"] });
     },
   });
 
@@ -92,23 +96,41 @@ export default function AddPromo() {
       starting_date: "",
       ending_date: "",
       description: "",
-      target_category_id: "1",
+      target_category_id: "",
       is_specific: false,
       target_products: [],
     },
+  });
+  const business_cat = form.watch("business_category_id");
+  const BUSINESS_CATEGORY_MAP: Record<string, BusinessCategory> = {
+    "1": "retail",
+    "2": "labor_service",
+    "3": "food_service",
+    "4": "rental",
+    "5": "ecommerce",
+  };
+
+  const categoryKey: BusinessCategory | undefined = business_cat
+    ? BUSINESS_CATEGORY_MAP[business_cat]
+    : undefined;
+
+  const { data: cats, isPending: catPending } = useQuery({
+    queryKey: ["categories", token],
+    queryFn: () => getCategories(token),
+    enabled: !!token && !!business_cat,
   });
 
   const onSubmit = (values: z.infer<typeof schema>) => {
     const formData = new FormData();
 
-    formData.append("business_category_id", values.business_category_id);
+    formData.append("business_category_id", values.business_category_id ?? "1");
     formData.append("title", values.title);
     formData.append("type", values.type);
     formData.append("discount_value", values.discount_value);
-    formData.append("starting_date", values.starting_date);
-    formData.append("ending_date", values.ending_date);
+    formData.append("starting_date", toDDMMYYYY(values.starting_date));
+    formData.append("ending_date", toDDMMYYYY(values.ending_date));
     formData.append("description", values.description);
-    formData.append("target_category_id", values.target_category_id);
+    formData.append("target_category_id", values.target_category_id ?? "");
     formData.append("is_specific", values.is_specific ? "1" : "0");
 
     if (values.is_specific && selectedProducts.length > 0) {
@@ -200,9 +222,9 @@ export default function AddPromo() {
             </div>
           </div>
 
-          <Label>Target Category</Label>
+          <Label>Business Category</Label>
           <Select
-            onValueChange={(v) => form.setValue("target_category_id", v)}
+            onValueChange={(v) => form.setValue("business_category_id", v)}
             defaultValue="1"
           >
             <SelectTrigger className="w-full">
@@ -214,6 +236,24 @@ export default function AddPromo() {
               <SelectItem value="3">Food Service</SelectItem>
               <SelectItem value="4">Rental</SelectItem>
               <SelectItem value="5">Ecommerce</SelectItem>
+            </SelectContent>
+          </Select>
+          <Label>Target Category</Label>
+          <Select
+            onValueChange={(v) => form.setValue("target_category_id", v)}
+            defaultValue="1"
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent>
+              {!catPending &&
+                categoryKey &&
+                cats?.data?.[categoryKey]?.map((item) => (
+                  <SelectItem key={item.id} value={String(item.id)}>
+                    {item.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
 

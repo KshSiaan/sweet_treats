@@ -1,3 +1,4 @@
+"use client";
 import {
   DollarSignIcon,
   FileTextIcon,
@@ -21,35 +22,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const dataset = [
-  {
-    title: "Total Revenue",
-    amm: "$12,458",
-    desc: "↑ 12.5% from last month",
-    icon: DollarSignIcon,
-  },
-  {
-    title: "Orders",
-    amm: 142,
-    desc: "↑ 8.2% from last month",
-    icon: FileTextIcon,
-  },
-  {
-    title: "Products Sold",
-    amm: 289,
-    desc: "↑ 5.7% from last month",
-    icon: PackageIcon,
-  },
-  {
-    title: "Customer Visits",
-    amm: 1024,
-    desc: "↓ 2.3% from last month",
-    icon: UsersIcon,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getBusinessDashboard } from "@/lib/api/business";
+import { useCookies } from "react-cookie";
 
 export default function Page() {
+  const [{ token }] = useCookies(["token"]);
+  const { data, isPending } = useQuery({
+    queryKey: ["business-dashboard"],
+    queryFn: () => {
+      return getBusinessDashboard(token);
+    },
+  });
+  const dataset = [
+    {
+      title: "Total Sales",
+      amm: `$${data?.data.total_sales?.total ?? 0}`,
+      desc: data?.data.total_sales?.label ?? "N/A",
+      icon: DollarSignIcon,
+    },
+    {
+      title: "Orders",
+      amm: data?.data.total_orders?.total ?? 0,
+      desc: data?.data.total_orders?.label ?? "N/A",
+      icon: FileTextIcon,
+    },
+    {
+      title: "Total Orders",
+      amm: data?.data.total_orders?.total ?? 0,
+      desc: data?.data.total_orders?.label ?? "N/A",
+      icon: PackageIcon,
+    },
+    {
+      title: "Pending Orders",
+      amm: data?.data.pending_orders?.total ?? 0,
+      desc: data?.data?.pending_orders?.label ?? "N/A",
+      icon: UsersIcon,
+    },
+    {
+      title: "Completed Orders",
+      amm: data?.data.completed_orders?.total ?? 0,
+      desc: data?.data?.completed_orders?.label ?? "N/A",
+      icon: UsersIcon,
+    },
+    {
+      title: "Satisfaction Rate",
+      amm: data?.data.satisfaction_rate?.total ?? 0,
+      desc: data?.data.satisfaction_rate?.label ?? "N/A",
+      icon: UsersIcon,
+    },
+  ];
   return (
     <div className="w-full h-full flex flex-col gap-6">
       <div className="">
@@ -60,7 +82,7 @@ export default function Page() {
           Welcome back! Here's an overview of your business performance.
         </p>
       </div>
-      <div className="grid auto-rows-min gap-4 md:grid-cols-4">
+      <div className="grid auto-rows-min gap-4 md:grid-cols-6">
         {dataset.map((x) => (
           <div
             className="bg-background p-3 border shadow aspect-[3/1] rounded-xl flex justify-between items-center"
@@ -85,7 +107,7 @@ export default function Page() {
       </div>
       <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min bg-background! flex flex-col justify-start items-start">
         <h3 className="text-2xl font-semibold text-primary mb-6">
-          Recent Activity
+          Recent Order Activity
         </h3>
         <Table className="">
           <TableHeader className="bg-accent ">
@@ -97,30 +119,62 @@ export default function Page() {
                 Customer
               </TableHead>
               <TableHead className="text-primary! text-center">Items</TableHead>
-              <TableHead className="text-primary! text-center">Time</TableHead>
+              <TableHead className="text-primary! text-center">
+                Order Date
+              </TableHead>
               <TableHead className="text-primary! text-center">
                 Status
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="text-center">#ORD-7840</TableCell>
-              <TableCell className="text-center">Sarah Johnson</TableCell>
-              <TableCell className="text-center">
-                1 Wireless Headphone
-              </TableCell>
-              <TableCell className="text-center">10:24 AM</TableCell>
-              <TableCell className="text-center">
-                <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                  <span
-                    className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                    aria-hidden="true"
-                  />
-                  Completed
-                </Badge>
-              </TableCell>
-            </TableRow>
+            {data?.data?.recent_order_activity?.map((order) => (
+              <TableRow>
+                <TableCell className="text-center">
+                  {order.order_number}
+                </TableCell>
+                <TableCell className="text-center">
+                  {order?.shipping_info?.name}
+                </TableCell>
+                <TableCell className="text-center">
+                  {order?.order_item?.map((x) => x.product_name).join(", ")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {new Date(order?.order_date).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-center">
+                  {/* ['Pending', 'Canceled', 'In Progress', 'Ready', 'On The Way', 'Delivery Accepted'] */}
+                  {order?.status === "Pending" ||
+                  order?.status === "In Progress" ||
+                  order?.status === "On The Way" ||
+                  order?.status === "Ready" ? (
+                    <Badge className="rounded-full border-none bg-yellow-600/10 text-yellow-600 focus-visible:ring-yellow-600/20 focus-visible:outline-none dark:bg-yellow-400/10 dark:text-yellow-400 dark:focus-visible:ring-yellow-400/40 [a&]:hover:bg-yellow-600/5 dark:[a&]:hover:bg-yellow-400/5">
+                      <span
+                        className="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"
+                        aria-hidden="true"
+                      />
+                      {order?.status}
+                    </Badge>
+                  ) : order?.status === "Delivery Accepted" ? (
+                    <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                      <span
+                        className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                        aria-hidden="true"
+                      />
+                      {order?.status}
+                    </Badge>
+                  ) : (
+                    <Badge className="rounded-full border-none bg-red-600/10 text-red-600 focus-visible:ring-red-600/20 focus-visible:outline-none dark:bg-red-400/10 dark:text-red-400 dark:focus-visible:ring-red-400/40 [a&]:hover:bg-red-600/5 dark:[a&]:hover:bg-red-400/5">
+                      <span
+                        className="size-1.5 rounded-full bg-red-600 dark:bg-red-400"
+                        aria-hidden="true"
+                      />
+                      {order?.status}
+                    </Badge>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -128,7 +182,7 @@ export default function Page() {
         <h3 className="text-2xl font-semibold text-primary mb-6">
           Sales Performance
         </h3>
-        <Select>
+        {/* <Select>
           <SelectTrigger>
             <SelectValue placeholder="Select Timeline" />
           </SelectTrigger>
@@ -137,7 +191,7 @@ export default function Page() {
             <SelectItem value="30">This month</SelectItem>
             <SelectItem value="360">This Year</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
       </div>
       <div className="flex justify-center items-center gap-6">
         <span className="h-6 w-16 bg-primary rounded-sm"></span>
@@ -146,7 +200,7 @@ export default function Page() {
       <div className="w-full grid grid-cols-1 gap-6">
         <div className="flex-1 rounded-xl p-6 border bg-background! h-full">
           <div className="flex-1 w-full flex justify-center items-center pt-6">
-            <ChartBarDefault />
+            <ChartBarDefault data={data?.data?.sales_performance} />
           </div>
         </div>
       </div>

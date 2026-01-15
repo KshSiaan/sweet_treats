@@ -1,3 +1,70 @@
+
+export interface BusinessDashboardType {
+    total_sales: {
+      total: number
+      label: string
+    }
+    total_orders: {
+      total: number
+      label: string
+    }
+    pending_orders: {
+      total: number
+      label: string
+    }
+    completed_orders: {
+      total: number
+      label: string
+    }
+    satisfaction_rate: {
+      total: number
+      label: string
+    }
+    recent_order_activity: Array<{
+      id: number
+      order_number: string
+      customer_id: number
+      business_id: number
+      order_date: string
+      amount_info: {
+        sub_total: number
+        shipping_cost: number
+        discount: number
+        total_amount: number
+      }
+      order_item: Array<{
+        product_id: number
+        business_category_id: number
+        product_category_id: number
+        product_name: string
+        product_price: number
+        quantity: number
+        unit: string
+      }>
+      shipping_info: {
+        name: string
+        address: string
+        city: string
+        zip: number
+        phone_number: string
+      }
+      payment_method: string
+      status: string
+      assign_employee_id?: number
+      transaction_id: any
+      created_at: string
+      updated_at: string
+    }>
+    sales_performance: {
+      retail_total_sales: number
+      labor_Service_total_sales: number
+      food_Service_total_sales: number
+      rental_total_sales: number
+      ecommerce_total_sales: number
+    }
+  }
+
+
 export interface StoreFrontType {
   id: number;
   business_id: number;
@@ -11,7 +78,7 @@ export interface StoreFrontType {
 
 export type BusinessCategory =
   | "retail"
-  | "labour_service"
+  | "labor_service"
   | "food_service"
   | "rental"
   | "ecommerce"

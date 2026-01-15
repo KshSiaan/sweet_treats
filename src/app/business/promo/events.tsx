@@ -16,6 +16,8 @@ import { useCookies } from "react-cookie";
 import { getEvents } from "@/lib/api/business";
 import { base_url, cn } from "@/lib/utils";
 import AddEvent from "./add-event";
+import EditEvent from "./edit-event";
+
 export default function Events() {
   const [{ token }] = useCookies(["token"]);
   const { data, isPending } = useQuery({
@@ -92,12 +94,12 @@ export default function Events() {
                   </div> */}
                 </div>
               </CardContent>
-              {/* <CardFooter className="space-x-4">
-                <EditEvent />
+              <CardFooter className="space-x-4">
+                <EditEvent data={item} />
                 <Button className="px-12" variant={"destructive"}>
                   End Promotion
                 </Button>
-              </CardFooter> */}
+              </CardFooter>
             </Card>
           ))
         )}

@@ -76,11 +76,11 @@ const data = {
       url: `${prefix}/employee`,
       icon: UsersRoundIcon,
     },
-    {
-      name: "Purchasing System",
-      url: `${prefix}/purchasing`,
-      icon: TagIcon,
-    },
+    // {
+    //   name: "Purchasing System",
+    //   url: `${prefix}/purchasing`,
+    //   icon: TagIcon,
+    // },
     {
       name: "Wallet System",
       url: `${prefix}/wallet`,
