@@ -44,9 +44,12 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { getTransaction } from "@/lib/api/business";
+import { cn } from "@/lib/utils";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import React from "react";
+import Transfer from "./transfer";
+import Deposit from "./deposit";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
@@ -65,80 +68,8 @@ export default async function Page() {
             Main Wallet
           </CardTitle>
           <div className="space-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant={"outline"}>
-                  <PlusIcon />
-                  Transfer
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="p-0! ">
-                <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                  <DialogTitle>Transfer Funds</DialogTitle>
-                </DialogHeader>
-                <div className="px-6 pb-6 space-y-4">
-                  <Label>Amount</Label>
-                  <Input placeholder="Enter fund amount" />
-                  <Label>Payment method</Label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Credit Card</SelectItem>
-                      <SelectItem value="2">Debit Card</SelectItem>
-                      <SelectItem value="3">Bank Transfer</SelectItem>
-                      <SelectItem value="4">Paypal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Label>Note (Optional)</Label>
-                  <Textarea />
-                </div>
-                <DialogFooter className="p-4">
-                  <DialogClose asChild>
-                    <Button variant={"outline"}>Cancel</Button>
-                  </DialogClose>
-                  <Button>Transfer</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <PlusIcon />
-                  Deposit
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="p-0! ">
-                <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                  <DialogTitle>Deposit Funds</DialogTitle>
-                </DialogHeader>
-                <div className="px-6 pb-6 space-y-4">
-                  <Label>Amount</Label>
-                  <Input placeholder="Enter fund amount" />
-                  <Label>Payment method</Label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Credit Card</SelectItem>
-                      <SelectItem value="2">Debit Card</SelectItem>
-                      <SelectItem value="3">Bank Transfer</SelectItem>
-                      <SelectItem value="4">Paypal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Label>Note (Optional)</Label>
-                  <Textarea />
-                </div>
-                <DialogFooter className="p-4">
-                  <DialogClose asChild>
-                    <Button variant={"outline"}>Cancel</Button>
-                  </DialogClose>
-                  <Button>Deposit</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Transfer />
+            <Deposit />
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="bg-blue-500">
@@ -202,8 +133,8 @@ export default async function Page() {
                   </div>
                 </div>
                 <div className="">
-                  <p className="text-xl font-semibold text-green-600">
-                    +${transaction?.amount}
+                  <p className={cn("text-xl font-semibold")}>
+                    ${transaction?.amount}
                   </p>
                 </div>
               </div>
