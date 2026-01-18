@@ -13,11 +13,6 @@ import {
 
 export const description = "A donut chart";
 
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-];
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -32,7 +27,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function DonutChart() {
+export function DonutChart({
+  data,
+}: {
+  data: { male: number; female: number };
+}) {
+  const chartData = [
+    { browser: "chrome", visitors: data.male, fill: "var(--color-chrome)" },
+    { browser: "safari", visitors: data.female, fill: "var(--color-safari)" },
+  ];
   return (
     <ChartContainer
       config={chartConfig}

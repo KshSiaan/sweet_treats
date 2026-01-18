@@ -12,8 +12,17 @@ import {
 import { DonutChart } from "./donut-chart";
 import { PieChartBlock } from "./pie-chart";
 import { Badge } from "@/components/ui/badge";
+import { cookies } from "next/headers";
+import { getStatisticsCD } from "@/lib/api/business";
+import { notFound } from "next/navigation";
 
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value;
+
+  if (!token) {
+    return notFound();
+  }
+  const CD = await getStatisticsCD(token);
   return (
     <section>
       <div className="mb-6">
@@ -30,10 +39,10 @@ export default function Page() {
       <Card>
         <CardContent className="w-full grid grid-cols-2 gap-6">
           <div className="w-fullf flex justify-center items-center">
-            <DonutChart />
+            <DonutChart data={CD.data.gender} />
           </div>
           <div className="w-fullf flex justify-center items-center">
-            <PieChartBlock />
+            <PieChartBlock data={CD.data.age} />
           </div>
         </CardContent>
       </Card>

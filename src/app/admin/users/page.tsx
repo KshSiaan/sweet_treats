@@ -1,6 +1,7 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -10,16 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -29,77 +21,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertTriangleIcon, PlusIcon } from "lucide-react";
+import { getAdminUsers } from "@/lib/api/admin";
+import { useQuery } from "@tanstack/react-query";
+
+import { useState } from "react";
+import { useCookies } from "react-cookie";
+import Suspend from "./suspend";
 
 export default function Page() {
+  const [{ token }] = useCookies(["token"]);
+  const [page, setPage] = useState(1);
+  const { data, isPending } = useQuery({
+    queryKey: ["admin-user-management", page],
+    queryFn: () => {
+      return getAdminUsers(token, page, 12);
+    },
+  });
   return (
     <section>
       <div className="w-full flex justify-between items-center py-4">
-        <h2 className="mb-6 text-2xl font-semibold text-primary">
-          User Management
-        </h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusIcon />
-              Add a new user
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="p-0!">
-            <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-              <DialogTitle>Add New User</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 p-4!">
-              <Label>Full name</Label>
-              <Input placeholder="" />
-              <Label>Email</Label>
-              <Input placeholder="" />
-              <Label>User Type </Label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Customer</SelectItem>
-                  <SelectItem value="inactive">Business Owner</SelectItem>
-                </SelectContent>
-              </Select>
-              <Label>Status</Label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-              <Label>Initial Notes</Label>
-              <Textarea className="resize-none!" placeholder="" />
-            </div>
-            <DialogFooter className="p-4!">
-              <DialogClose asChild>
-                <Button className="px-12" variant={"outline"} size={"lg"}>
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button className="px-12" size={"lg"}>
-                Create User
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <h2 className="text-2xl font-semibold text-primary">User Management</h2>
       </div>
-      <Card className="p-0! overflow-hidden!">
-        <CardContent className="p-0! ">
+      <Card className="pt-0 overflow-hidden!">
+        <CardContent className="px-0">
           <Table className="">
             <TableHeader className="bg-accent ">
               <TableRow>
                 <TableHead className="text-primary! text-center">
+                  User Name
+                </TableHead>
+                <TableHead className="text-primary! text-center">
                   Email
                 </TableHead>
                 <TableHead className="text-primary! text-center">
-                  Type
+                  User Type
                 </TableHead>
                 <TableHead className="text-primary! text-center">
                   Status
@@ -113,186 +68,144 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="text-center">
-                  john.doe@example.com
-                </TableCell>
-                <TableCell className="text-center">Customer</TableCell>
-                <TableCell className="text-center">
-                  <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                    <span
-                      className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                      aria-hidden="true"
-                    />
-                    Active
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center">Oct 15, 2025</TableCell>
-                <TableCell className="text-center gap-2! space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline">View</Button>
-                    </DialogTrigger>
-                    <DialogContent className="p-0!">
-                      <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                        <DialogTitle>User Details</DialogTitle>
-                      </DialogHeader>
-                      <div className="w-full grid grid-cols-2 gap-6 p-4">
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Full name
-                          </h5>
-                          <p className="text-muted-foreground">John Doe</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            User Type
-                          </h5>
-                          <p className="text-muted-foreground">Customer</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Email
-                          </h5>
-                          <p className="text-muted-foreground">
-                            john.doe@example.com
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Registration Date
-                          </h5>
-                          <p className="text-muted-foreground">Oct 15, 2025</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Status
-                          </h5>
-                          <p className="text-muted-foreground">
-                            <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                              <span
-                                className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                                aria-hidden="true"
-                              />
-                              Completed
-                            </Badge>
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Last Login
-                          </h5>
-                          <p className="text-muted-foreground">
-                            Today, 09:24 AM
-                          </p>
-                        </div>
-                        <div className="col-span-2 space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Account Notes
-                          </h5>
-                          <Textarea
-                            className="resize-none"
-                            placeholder="Add notes about ths user....."
+              {!isPending &&
+                data?.data?.data.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="text-center">
+                      {user.full_name}
+                    </TableCell>
+                    <TableCell className="text-center">{user.email}</TableCell>
+                    <TableCell className="text-center">
+                      {user.role === "CUSTOMER"
+                        ? "Customer"
+                        : user.role === "BUSINESS"
+                          ? "Business Owner"
+                          : user?.role === "EMPLOYEE"
+                            ? "Employee"
+                            : user.role}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {user?.status === "Active" ? (
+                        <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                          <span
+                            className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                            aria-hidden="true"
                           />
-                        </div>
-                      </div>
-                      <DialogFooter className="p-4 pt-0!">
-                        <DialogClose asChild>
-                          <Button variant={"outline"} className="px-6">
-                            Close
-                          </Button>
-                        </DialogClose>
-                        <Button className="px-6">Save Notes</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="bg-amber-100! text-amber-600">
-                        Suspend
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                      </DialogHeader>
-                      <div className="flex flex-col justify-center items-center gap-3">
-                        <AlertTriangleIcon className="text-yellow-500 size-16" />
-                        <h4 className="text-muted-foreground text-xl font-bold">
-                          Suspend User
-                        </h4>
-                        <p className="text-sm text-center text-muted-foreground">
-                          Are you sure you want to suspend this user?
-                        </p>
-                        <div className="w-2/3 mx-auto grid grid-cols-2 gap-4">
-                          <DialogClose asChild>
-                            <Button variant={"outline"}>Cancel</Button>
-                          </DialogClose>
-                          <Button>Confirm</Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button>Edit</Button>
-                    </DialogTrigger>
-                    <DialogContent className="p-0!">
-                      <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                        <DialogTitle>Edit User details</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-6 p-4!">
-                        <Label>Full name</Label>
-                        <Input placeholder="" />
-                        <Label>Email</Label>
-                        <Input placeholder="" />
-                        <Label>User Type </Label>
-                        <Select>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Customer</SelectItem>
-                            <SelectItem value="inactive">
-                              Business Owner
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Label>Status</Label>
-                        <Select>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Label>Initial Notes</Label>
-                        <Textarea className="resize-none!" placeholder="" />
-                      </div>
-                      <DialogFooter className="p-4!">
-                        <DialogClose asChild>
-                          <Button
-                            className="px-12"
-                            variant={"outline"}
-                            size={"lg"}
-                          >
-                            Cancel
-                          </Button>
-                        </DialogClose>
-                        <Button className="px-12" size={"lg"}>
-                          Update
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </TableCell>
-              </TableRow>
+                          {user?.status}
+                        </Badge>
+                      ) : (
+                        <Badge className="rounded-full border-none bg-red-600/10 text-red-600 focus-visible:ring-red-600/20 focus-visible:outline-none dark:bg-red-400/10 dark:text-red-400 dark:focus-visible:ring-red-400/40 [a&]:hover:bg-red-600/5 dark:[a&]:hover:bg-red-400/5">
+                          <span
+                            className="size-1.5 rounded-full bg-red-600 dark:bg-red-400"
+                            aria-hidden="true"
+                          />
+                          {user?.status}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-center gap-2! space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline">View</Button>
+                        </DialogTrigger>
+                        <DialogContent className="p-0!">
+                          <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
+                            <DialogTitle>User Details</DialogTitle>
+                          </DialogHeader>
+                          <div className="w-full grid grid-cols-2 gap-6 p-4">
+                            <div className="space-y-2">
+                              <h5 className="text-lg font-semibold text-muted-foreground">
+                                Full name
+                              </h5>
+                              <p className="text-muted-foreground">
+                                {user.full_name}
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <h5 className="text-lg font-semibold text-muted-foreground">
+                                User Type
+                              </h5>
+                              <p className="text-muted-foreground">
+                                {user.role === "CUSTOMER"
+                                  ? "Customer"
+                                  : user?.role === "BUSINESS_OWNER"
+                                    ? "Business Owner"
+                                    : user?.role === "EMPLOYEE"
+                                      ? "Employee"
+                                      : user.role}
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <h5 className="text-lg font-semibold text-muted-foreground">
+                                Email
+                              </h5>
+                              <p className="text-muted-foreground">
+                                {user.email}
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <h5 className="text-lg font-semibold text-muted-foreground">
+                                Registration Date
+                              </h5>
+                              <p className="text-muted-foreground">
+                                {new Date(user.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <h5 className="text-lg font-semibold text-muted-foreground">
+                                Status
+                              </h5>
+                              <p className="text-muted-foreground">
+                                <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                                  <span
+                                    className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                                    aria-hidden="true"
+                                  />
+                                  Completed
+                                </Badge>
+                              </p>
+                            </div>
+                          </div>
+                          <DialogFooter className="p-4 pt-0!">
+                            <DialogClose asChild>
+                              <Button variant={"outline"} className="px-6">
+                                Close
+                              </Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                      <Suspend data={user} />
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </CardContent>
+        <CardFooter className="border-t">
+          <div className="w-full flex justify-end items-center space-x-2">
+            <Button
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              Previous
+            </Button>
+            <p className=" font-semibold text-muted-foreground text-sm">
+              {data?.data?.current_page} of {data?.data?.total}
+            </p>
+            <Button
+              variant="outline"
+              disabled={data?.data?.data.length! < 12}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
     </section>
   );

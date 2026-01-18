@@ -47,9 +47,10 @@ import { getTransaction } from "@/lib/api/business";
 import { cn } from "@/lib/utils";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
-import React from "react";
+import React, { Suspense } from "react";
 import Transfer from "./transfer";
 import Deposit from "./deposit";
+import Withdraw from "./withdraw";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
@@ -68,45 +69,13 @@ export default async function Page() {
             Main Wallet
           </CardTitle>
           <div className="space-x-2">
-            <Transfer />
+            <Suspense fallback={<div>...</div>}>
+              <Transfer />
+            </Suspense>
             <Deposit />
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-500">
-                  <PlusIcon />
-                  Withdraw
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="p-0! ">
-                <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                  <DialogTitle>Transfer Funds</DialogTitle>
-                </DialogHeader>
-                <div className="px-6 pb-6 space-y-4">
-                  <Label>Amount</Label>
-                  <Input placeholder="Enter fund amount" />
-                  <Label>Payment method</Label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Credit Card</SelectItem>
-                      <SelectItem value="2">Debit Card</SelectItem>
-                      <SelectItem value="3">Bank Transfer</SelectItem>
-                      <SelectItem value="4">Paypal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Label>Note (Optional)</Label>
-                  <Textarea />
-                </div>
-                <DialogFooter className="p-4">
-                  <DialogClose asChild>
-                    <Button variant={"outline"}>Cancel</Button>
-                  </DialogClose>
-                  <Button>Withdraw</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Suspense fallback={<div>...</div>}>
+              <Withdraw token={token} />
+            </Suspense>
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -121,7 +90,10 @@ export default async function Page() {
           </div>
           <div className="divide-y border-t pt-6">
             {data?.data?.transactions_histories.data?.map((transaction) => (
-              <div className="w-full p-y rounded-sm flex justify-between items-center">
+              <div
+                className="w-full p-y rounded-sm flex justify-between items-center"
+                key={transaction.id}
+              >
                 <div className="flex gap-4 items-center justify-start">
                   <div className="h-full space-y-2 py-6">
                     <h4 className="font-bold text-lg">

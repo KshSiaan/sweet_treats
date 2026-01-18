@@ -66,3 +66,57 @@ export async function createPaymentIntent(token:string,{
         payment_method_types
     }});
 }
+
+export async function connectStripeAccount(token:string):Promise<{
+    "status": boolean,
+    "message": string,
+    "onboarding_url": string,
+    "stripe_account_id": string
+}>{
+    return howl(`/create-connected-account`,{token,method:"POST",body:{}});
+}
+
+export async function getGlobalUsers(token:string,type:"BUSINESS"|"CUSTOMER"|"EMPLOYEE"):Promise<ApiResponse<{
+    id: number
+    full_name: string
+    role: string
+    avatar_url: string
+    profile: {
+      id: number
+      user_id: number
+      store_name?: string
+    }
+  }[]>>{
+    return howl(`/to-users?filter=${type}`,{token});
+}
+export async function transferApi(token:string,body:{
+  to:string,
+  amount:string,
+  descripton?:string|undefined,
+  purpose:string
+}):Promise<ApiResponse<{
+    sender: {
+      id: number
+      user_id: number
+      wallet_balance: number
+      user: {
+        id: number
+        full_name: string
+        role: string
+        avatar_url: string
+      }
+    }
+    receiver: {
+      id: number
+      user_id: number
+      wallet_balance: number
+      user: {
+        id: number
+        full_name: string
+        role: string
+        avatar_url: string
+      }
+    }
+  }>>{
+    return howl(`/transfer`,{token, method: "POST", body});
+}

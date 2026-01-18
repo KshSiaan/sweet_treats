@@ -29,6 +29,35 @@ export interface UserType {
   avatar_url?: string
 }
 
+export interface BusinessUserType{
+      id: number
+      full_name: string
+      role: string
+      email: string
+      status: string
+      created_at: string
+      avatar_url: string
+      profile: {
+        id: number
+        user_id: number
+        store_name: string
+        store_location: string
+        latitude?: string
+        longitude?: string
+        store_open: any
+        store_close: any
+        store_description: any
+        shipping_type: any
+        product_delivery_cost: string
+        wallet_balance: string
+        total_withdraw: string
+        gender: any
+        age: any
+        created_at: string
+        updated_at: string
+      }
+    }
+
 export interface TeamType{
   id: number
   player_id: number

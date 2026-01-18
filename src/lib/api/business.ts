@@ -293,3 +293,35 @@ export async function addEvent(
   ): Promise<ApiResponse<EventType>> {
     return howl(`/business/event/${id}`, { token, method: "DELETE" });
   }
+
+export async function getStatisticsCD(token:string):Promise<ApiResponse<{
+  gender: {
+    male: number
+    female: number
+  }
+  age: {
+    age_18to24: number
+    age_25to34: number
+    age_35to44: number
+    age_45to54: number
+    age_55toup: number
+  }
+}>>{
+    return howl(`/business/get-customer-demographics`,{token});
+}
+
+export async function getStatisticsEP(token:string):Promise<ApiResponse<{
+  gender: {
+    male: number
+    female: number
+  }
+  age: {
+    age_18to24: number
+    age_25to34: number
+    age_35to44: number
+    age_45to54: number
+    age_55toup: number
+  }
+}>>{
+    return howl(`/business/get-employee-performance`,{token});
+}

@@ -29,6 +29,9 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { createPaymentIntent } from "@/lib/api/global";
+import { useStripeInformation } from "@/lib/store/stripe";
+import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
 
 /* -------------------- Zod Schema -------------------- */
 const depositSchema = z.object({
@@ -40,6 +43,9 @@ type DepositForm = z.infer<typeof depositSchema>;
 
 /* -------------------- Component -------------------- */
 export default function Deposit() {
+  const { setPaymentInfo } = useStripeInformation();
+  const [{ token }] = useCookies(["token"]);
+  const navig = useRouter();
   const form = useForm({
     resolver: zodResolver(depositSchema),
     defaultValues: {
@@ -48,23 +54,34 @@ export default function Deposit() {
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["payment_intent"],
     mutationFn: (body: {
       amount: number | string;
       payment_method_types: string;
     }) => {
-      return createPaymentIntent("token", body);
+      return createPaymentIntent(token, body);
     },
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
     },
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
+      setPaymentInfo({
+        paymentIntent: res.data.id,
+        clientSecret: res.data.client_secret,
+        amount: res.data.amount,
+      });
+      navig.push("/business/wallet/deposit");
     },
   });
 
-  const onSubmit = (data: DepositForm) => {};
+  const onSubmit = (data: DepositForm) => {
+    mutate({
+      amount: data.amount,
+      payment_method_types: data.payment_method_types,
+    });
+  };
 
   return (
     <Dialog>
@@ -113,7 +130,9 @@ export default function Deposit() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Deposit</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Processing..." : "Deposit"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
