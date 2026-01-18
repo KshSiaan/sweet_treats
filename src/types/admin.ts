@@ -75,12 +75,21 @@ export interface AdminEventsApiType{
     avatar_url: string
   }
 }
-export interface AdminDisputeType{
-  id: number
-  reported_by: number
-  against: number
-  reason: string
-  status: string
-  created_at: string
-  updated_at: string
-}
+export interface AdminContenttype{
+    id: number
+    business_id: number
+    product_id: number
+    customer_id: number
+    title: string
+    rating: number
+    experience: string
+    status: string
+    created_at: string
+    updated_at: string
+    customer: {
+      id: number
+      full_name: string
+      role: string
+      avatar_url: string
+    }
+  }

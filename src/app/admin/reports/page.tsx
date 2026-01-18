@@ -27,9 +27,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { getAdminContents } from "@/lib/api/admin";
 import { AlertTriangleIcon } from "lucide-react";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import Approve from "./approve";
+import Remove from "./remove";
+import { Suspense } from "react";
 
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value;
+  if (!token) {
+    return notFound();
+  }
+  const data = await getAdminContents(token);
   return (
     <section>
       <div className="w-full flex justify-between items-center py-4">
@@ -43,19 +54,13 @@ export default function Page() {
             <TableHeader className="bg-accent ">
               <TableRow>
                 <TableHead className="text-primary! text-center">
-                  Content ID
+                  Customer Name
                 </TableHead>
                 <TableHead className="text-primary! text-center">
-                  Type
+                  Product Name
                 </TableHead>
                 <TableHead className="text-primary! text-center">
-                  Author
-                </TableHead>
-                <TableHead className="text-primary! text-center">
-                  Preview
-                </TableHead>
-                <TableHead className="text-primary! text-center">
-                  Flags
+                  Comment
                 </TableHead>
                 <TableHead className="text-primary! text-center">
                   Status
@@ -66,147 +71,151 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="text-center">#REV-2001</TableCell>
-                <TableCell className="text-center">Review</TableCell>
-                <TableCell className="text-center">Sarah Johnson</TableCell>
-                <TableCell className="text-center">
-                  The service was terrible and the...
-                </TableCell>
-                <TableCell className="text-center">3</TableCell>
-                <TableCell className="text-center">
-                  <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                    <span
-                      className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                      aria-hidden="true"
-                    />
-                    Active
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center gap-2! space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline">View</Button>
-                    </DialogTrigger>
-                    <DialogContent className="p-0!">
-                      <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                        <DialogTitle>User Details</DialogTitle>
-                      </DialogHeader>
-                      <div className="w-full grid grid-cols-2 gap-6 p-4">
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Content Type
-                          </h5>
-                          <p className="text-muted-foreground text-sm">
-                            Review
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Flags
-                          </h5>
-                          <p className="text-muted-foreground text-sm">3</p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Author
-                          </h5>
-                          <p className="text-muted-foreground text-sm">
-                            Sarah Johnson
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Flag Reasons
-                          </h5>
-                          <ul className="list-disc list-inside">
-                            <li className="text-muted-foreground text-sm">
-                              In appropriate language
-                            </li>
-                            <li className="text-muted-foreground text-sm">
-                              False information
-                            </li>
-                            <li className="text-muted-foreground text-sm">
-                              Harassment
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Status
-                          </h5>
-                          <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                            <span
-                              className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                              aria-hidden="true"
+              {data.data.map((content) => (
+                <TableRow>
+                  <TableCell className="text-center">
+                    {content.customer.full_name}
+                  </TableCell>
+                  <TableCell className="text-center">{content.title}</TableCell>
+                  <TableCell className="text-center">
+                    {content.experience.slice(0, 20)}...
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {content.status === "Approved" ? (
+                      <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                          aria-hidden="true"
+                        />
+                        {content.status}
+                      </Badge>
+                    ) : content.status === "Under Review" ? (
+                      <Badge className="rounded-full border-none bg-yellow-600/10 text-yellow-600 focus-visible:ring-yellow-600/20 focus-visible:outline-none dark:bg-yellow-400/10 dark:text-yellow-400 dark:focus-visible:ring-yellow-400/40 [a&]:hover:bg-yellow-600/5 dark:[a&]:hover:bg-yellow-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"
+                          aria-hidden="true"
+                        />
+                        {content.status}
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-full border-none bg-red-600/10 text-red-600 focus-visible:ring-red-600/20 focus-visible:outline-none dark:bg-red-400/10 dark:text-red-400 dark:focus-visible:ring-red-400/40 [a&]:hover:bg-red-600/5 dark:[a&]:hover:bg-red-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-red-600 dark:bg-red-400"
+                          aria-hidden="true"
+                        />
+                        {content.status}
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center gap-2! space-x-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline">View</Button>
+                      </DialogTrigger>
+                      <DialogContent className="p-0!">
+                        <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
+                          <DialogTitle>User Details</DialogTitle>
+                        </DialogHeader>
+                        <div className="w-full grid grid-cols-2 gap-6 p-4">
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Content Type
+                            </h5>
+                            <p className="text-muted-foreground text-sm">
+                              Review
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Flags
+                            </h5>
+                            <p className="text-muted-foreground text-sm">3</p>
+                          </div>
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Author
+                            </h5>
+                            <p className="text-muted-foreground text-sm">
+                              Sarah Johnson
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Flag Reasons
+                            </h5>
+                            <ul className="list-disc list-inside">
+                              <li className="text-muted-foreground text-sm">
+                                In appropriate language
+                              </li>
+                              <li className="text-muted-foreground text-sm">
+                                False information
+                              </li>
+                              <li className="text-muted-foreground text-sm">
+                                Harassment
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Status
+                            </h5>
+                            <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                              <span
+                                className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                                aria-hidden="true"
+                              />
+                              Approved
+                            </Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              User Type
+                            </h5>
+                            <Select>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="customer">
+                                  Customer
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2 space-y-2">
+                            <h5 className="text-xl font-semibold text-muted-foreground">
+                              Account Notes
+                            </h5>
+                            <Textarea
+                              className="resize-none"
+                              readOnly
+                              placeholder="Add notes about ths user....."
                             />
-                            Approved
-                          </Badge>
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            User Type
-                          </h5>
-                          <Select>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="customer">Customer</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="col-span-2 space-y-2">
-                          <h5 className="text-xl font-semibold text-muted-foreground">
-                            Account Notes
-                          </h5>
-                          <Textarea
-                            className="resize-none"
-                            readOnly
-                            placeholder="Add notes about ths user....."
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter className="p-4 pt-0!">
-                        <DialogClose asChild>
-                          <Button variant={"outline"} className="px-6">
-                            Close
-                          </Button>
-                        </DialogClose>
-                        <Button className="px-6">Save Notes</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="bg-amber-100! text-amber-600">
-                        Flag
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                      </DialogHeader>
-                      <div className="flex flex-col justify-center items-center gap-3">
-                        <AlertTriangleIcon className="text-yellow-500 size-16" />
-                        <h4 className="text-muted-foreground text-xl font-bold">
-                          Flag Content
-                        </h4>
-                        <p className="text-sm text-center text-muted-foreground">
-                          Are you sure you want to flag this content for review?
-                        </p>
-                        <div className="w-2/3 mx-auto grid grid-cols-2 gap-4">
+                        <DialogFooter className="p-4 pt-0!">
                           <DialogClose asChild>
-                            <Button variant={"outline"}>Cancel</Button>
+                            <Button variant={"outline"} className="px-6">
+                              Close
+                            </Button>
                           </DialogClose>
-                          <Button>Confirm</Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </TableCell>
-              </TableRow>
+                          <Button className="px-6">Save Notes</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    {content.status === "Under Review" && (
+                      <>
+                        <Suspense>
+                          <Approve data={{ id: String(content.id) }} />
+                        </Suspense>
+                        <Suspense>
+                          <Remove data={{ id: String(content.id) }} />
+                        </Suspense>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

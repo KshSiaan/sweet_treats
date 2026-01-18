@@ -1,5 +1,5 @@
 
-import type { AdminDashboardApiType, AdminDisputeType, AdminEventsApiType } from "@/types/admin";
+import type { AdminContenttype, AdminDashboardApiType} from "@/types/admin";
 import { howl } from "../utils";
 import type { ApiResponse, Paginator } from "@/types/base";
 import type { BranchType, BusinessUserType, CashVerificationType, EventWinner, LeaderboardType, PaymentType, RefundType, TeamType, TransactionsApi, UserType } from "@/types/auth";
@@ -34,4 +34,13 @@ export async function adminSuspendToggle(token: string, userId: number): Promise
 }
 export async function getAdminBusinessUsers(token:string,page:number,perPage:number):Promise<ApiResponse<Paginator<BusinessUserType[]>>>{ 
     return howl(`/admin/get-business-accounts?per_page=${perPage}&page=${page}`, { token });
+}
+export async function getAdminContents(token:string):Promise<ApiResponse<AdminContenttype[]>>{ 
+    return howl(`/admin/get-contents`, { token });
+}
+export async function approveAdminContent(token:string, id: number):Promise<ApiResponse<AdminContenttype>>{ 
+    return howl(`/admin/approved/${id}`, { token,method:"PATCH" });
+}
+export async function removeAdminContent(token:string, id: number):Promise<ApiResponse<AdminContenttype>>{ 
+    return howl(`/admin/remove/${id}`, { token,method:"DELETE" });
 }
