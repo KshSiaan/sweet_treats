@@ -40,6 +40,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addEmployee } from "@/lib/api/business";
 import { toast } from "sonner";
 import { useCookies } from "react-cookie";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const EmployeeSchema = z.object({
   full_name: z.string().min(2, "Name is required"),
@@ -174,6 +175,10 @@ export default function AddEmployee() {
                 </FormItem>
               )}
             />
+            <p className="col-span-2 font-semibold text-sm text-muted-foreground flex items-center gap-2">
+              <Checkbox checked aria-readonly />
+              Send account activation instruction to user’s email
+            </p>
           </form>
         </Form>
 

@@ -63,7 +63,15 @@ export default function List() {
                   <AvatarFallback>UI</AvatarFallback>
                 </Avatar>
                 <div className="h-full">
-                  <h4 className="font-bold">{item?.employee?.full_name}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold">{item?.employee?.full_name}</h4>
+                    <Badge
+                      className="font-semibold text-xs!"
+                      variant={"outline"}
+                    >
+                      ID: {item?.empId}
+                    </Badge>
+                  </div>
                   {item?.employee?.status === "Active" ? (
                     <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
                       <span

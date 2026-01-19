@@ -13,7 +13,7 @@ import { DonutChart } from "./donut-chart";
 import { PieChartBlock } from "./pie-chart";
 import { Badge } from "@/components/ui/badge";
 import { cookies } from "next/headers";
-import { getStatisticsCD } from "@/lib/api/business";
+import { getStatisticsCD, getStatisticsEP } from "@/lib/api/business";
 import { notFound } from "next/navigation";
 
 export default async function Page() {
@@ -23,6 +23,7 @@ export default async function Page() {
     return notFound();
   }
   const CD = await getStatisticsCD(token);
+  const EP = await getStatisticsEP(token);
   return (
     <section>
       <div className="mb-6">
@@ -75,21 +76,47 @@ export default async function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="text-center">John Smith</TableCell>
-                <TableCell className="text-center">$8,452</TableCell>
-                <TableCell className="text-center">142</TableCell>
-                <TableCell className="text-center">4.8/5</TableCell>
-                <TableCell className="text-center">
-                  <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                    <span
-                      className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                      aria-hidden="true"
-                    />
-                    Excellent
-                  </Badge>
-                </TableCell>
-              </TableRow>
+              {EP.data.map((emp) => (
+                <TableRow>
+                  <TableCell className="text-center">
+                    {emp.employee_name}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    ${emp.total_sales}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {emp.order_completed}
+                  </TableCell>
+                  <TableCell className="text-center">{emp.rating}</TableCell>
+                  <TableCell className="text-center">
+                    {parseInt(emp?.rating[0]) >= 4 ? (
+                      <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
+                          aria-hidden="true"
+                        />
+                        Excellent
+                      </Badge>
+                    ) : parseInt(emp.rating[0]) > 2 ? (
+                      <Badge className="rounded-full border-none bg-yellow-600/10 text-yellow-600 focus-visible:ring-yellow-600/20 focus-visible:outline-none dark:bg-yellow-400/10 dark:text-yellow-400 dark:focus-visible:ring-yellow-400/40 [a&]:hover:bg-yellow-600/5 dark:[a&]:hover:bg-yellow-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-yellow-600 dark:bg-yellow-400"
+                          aria-hidden="true"
+                        />
+                        Good
+                      </Badge>
+                    ) : (
+                      <Badge className="rounded-full border-none bg-red-600/10 text-red-600 focus-visible:ring-red-600/20 focus-visible:outline-none dark:bg-red-400/10 dark:text-red-400 dark:focus-visible:ring-red-400/40 [a&]:hover:bg-red-600/5 dark:[a&]:hover:bg-red-400/5">
+                        <span
+                          className="size-1.5 rounded-full bg-red-600 dark:bg-red-400"
+                          aria-hidden="true"
+                        />
+                        Needs Improvement
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

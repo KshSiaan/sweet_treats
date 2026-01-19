@@ -84,7 +84,7 @@ export default function Page() {
             setCookie("token", res.data.token);
             router.push("/admin");
           },
-        }
+        },
       );
     }
     if (values.role === "owner") {
@@ -98,7 +98,7 @@ export default function Page() {
             setCookie("token", res.data.token);
             router.push("/business");
           },
-        }
+        },
       );
     }
     if (values.role === "employee") {
@@ -112,7 +112,7 @@ export default function Page() {
             setCookie("token", res.data.token);
             router.push("/employee");
           },
-        }
+        },
       );
     }
   }

@@ -20,7 +20,7 @@ export default async function Page() {
           </video>
         </div>
       )}
-      {data?.images.length > 0 && (
+      {data?.images?.length > 0 && (
         <div className="mb-6 space-y-4">
           <h3 className="text-2xl font-semibold text-primary ">Store Images</h3>
           <div className="w-full grid grid-cols-3 gap-6">
@@ -39,7 +39,7 @@ export default async function Page() {
       )}
 
       <div className="mb-6">
-        <h3 className="text-2xl font-semibold text-primary ">
+        <h3 className="text-2xl font-semibold text-primary">
           Store Front Customization
         </h3>
         <p className="text-sm text-muted-foreground">

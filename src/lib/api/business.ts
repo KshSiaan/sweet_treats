@@ -311,17 +311,16 @@ export async function getStatisticsCD(token:string):Promise<ApiResponse<{
 }
 
 export async function getStatisticsEP(token:string):Promise<ApiResponse<{
-  gender: {
-    male: number
-    female: number
-  }
-  age: {
-    age_18to24: number
-    age_25to34: number
-    age_35to44: number
-    age_45to54: number
-    age_55toup: number
-  }
-}>>{
+  id: number
+  empId: number
+  business_id: number
+  employee_id: number
+  created_at: string
+  updated_at: string
+  employee_name: string
+  total_sales: number
+  order_completed: number
+  rating: string
+}[]>>{
     return howl(`/business/get-employee-performance`,{token});
 }
