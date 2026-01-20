@@ -21,6 +21,7 @@ export async function getCategories(
 ): Promise<ApiResponse<CategoryType>> {
   return howl(`/business/product-category`, { token });
 }
+
 export async function addCategory(
   token: string,
   body: { name: string; business_category_id?: number }

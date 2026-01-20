@@ -143,9 +143,9 @@ export default function AddPromo() {
       formData.append("image", files[0]);
     }
     // 🔥 Console output exactly like you wanted
-    formData.forEach((value, key) => {
-      console.log(`${key}:${value}`);
-    });
+    // formData.forEach((value, key) => {
+    //   console.log(`${key}:${value}`);
+    // });
     mutate(formData);
   };
 
@@ -307,7 +307,7 @@ export default function AddPromo() {
                           form.setValue("target_products", arr);
                         } else {
                           const arr = selectedProducts.filter(
-                            (id) => id !== String(product.id)
+                            (id) => id !== String(product.id),
                           );
                           setSelectedProducts(arr);
                           form.setValue("target_products", arr);
