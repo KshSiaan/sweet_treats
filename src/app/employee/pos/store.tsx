@@ -3,16 +3,39 @@
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCookies } from "react-cookie";
-import { getEmployeeCategories, getEmployeeProducts } from "@/lib/api/employee";
+import {
+  createInvoiceApi,
+  getEmployeeCategories,
+  getEmployeeProducts,
+} from "@/lib/api/employee";
 import { BusinessCategory } from "@/types/dbs/business";
 import { Button } from "@/components/ui/button";
-import { base_url } from "@/lib/utils";
+import { base_url, cn } from "@/lib/utils";
 import { ProductType } from "@/types/dbs/employee";
-import { CreditCardIcon, MinusIcon, PlusIcon } from "lucide-react";
+import {
+  CreditCardIcon,
+  HandCoinsIcon,
+  MinusIcon,
+  PlusIcon,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { set } from "zod";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 type CartItem = ProductType & {
   quantity: number;
   count: number;
@@ -29,6 +52,14 @@ export default function Store() {
     id: string;
     name: string;
   } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<
+    "card" | "cash" | undefined
+  >();
+  const [customer, setCustomer] = React.useState({
+    name: "",
+    contact: "",
+    address: "",
+  });
 
   // fetch ONCE
   const { data, isError } = useQuery({
@@ -40,6 +71,42 @@ export default function Store() {
     queryKey: ["employee-products", token, selectedSubCategory?.id],
     queryFn: () => getEmployeeProducts(token, selectedSubCategory!.id),
     enabled: !!token && !!selectedSubCategory,
+  });
+  // ...existing code...
+  const { mutate } = useMutation({
+    mutationKey: ["create_invoice"],
+    mutationFn: (body: {
+      business_id: number;
+      amount_info: {
+        sub_total: number;
+        discount: number;
+        total_amount: number;
+      };
+      order_item: Array<{
+        product_id: number;
+        product_name: string;
+        product_price: number;
+        quantity: number;
+        unit?: string;
+        count?: number;
+      }>;
+      payment_method: string;
+    }) => createInvoiceApi(token, body),
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (res) => {
+      toast.success(res.message ?? "Success!");
+      setCart([]);
+      setCustomer({
+        name: "",
+        contact: "",
+        address: "",
+      });
+      setPaymentMethod(undefined);
+      setSelectedSubCategory(null);
+      setBusinessCategoryId(null);
+    },
   });
 
   const handleAddToCart = (product: ProductType) => {
@@ -95,6 +162,46 @@ export default function Store() {
         .filter((item) => item.count > 0),
     );
   };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCustomer((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  function handleSubmitOrder() {
+    const subTotal = cart.reduce(
+      (acc, item) => acc + parseFloat(item.price) * item.quantity,
+      0,
+    );
+
+    const payload = {
+      business_id: cart[0]?.business_id,
+      amount_info: {
+        sub_total: subTotal,
+        discount: 0,
+        total_amount: subTotal,
+      },
+      customer_info: {
+        name: customer.name,
+        address: customer.address,
+        phone_number: customer.contact,
+      },
+      order_item: cart.map((item) => ({
+        product_id: item.id,
+        product_name: item.product_name,
+        product_price: parseFloat(item.price),
+        quantity: item.quantity,
+        unit: item.unit,
+        count: item.count,
+        business_category_id: item.business_category_id,
+        product_category_id: item.product_category_id,
+      })),
+      payment_method: paymentMethod === "card" ? "Card" : "Cash",
+    };
+    mutate(payload);
+  }
 
   return (
     <section className="py-4 grid grid-cols-10 gap-6">
@@ -273,7 +380,7 @@ export default function Store() {
 
       {/* RIGHT */}
       <div className="col-span-3">
-        <div className=" max-h-dvh sticky top-4 space-y-4">
+        <div className="sticky top-4 space-y-4">
           <h1 className="text-2xl font-semibold text-primary">Cart</h1>
           <div className="space-y-4 max-h-[30dvh] overflow-y-auto">
             {cart.length === 0 && (
@@ -315,8 +422,8 @@ export default function Store() {
                     </div>
                     <div className="w-full h-full bg-primary/20 rounded-lg flex justify-between items-center p-1">
                       <Button
-                        size={"icon-sm"}
                         onClick={() => handleIncrementQuantity(item.id)}
+                        size={"icon-sm"}
                         className="size-6 rounded-full"
                         variant={"outline"}
                       >
@@ -337,9 +444,11 @@ export default function Store() {
 
                     {item.business_category_id === 2 ||
                       (item.business_category_id === 4 && (
-                        <div className="w-full h-full bg-primary/20 rounded-lg flex justify-between items-center">
+                        <div className="w-full h-full bg-primary/20 rounded-lg flex justify-between items-center p-1">
                           <Button
                             size={"icon-sm"}
+                            variant={"outline"}
+                            className="size-6 rounded-full"
                             onClick={() => handleIncrementCount(item.id)}
                           >
                             <PlusIcon />
@@ -349,6 +458,8 @@ export default function Store() {
                           </span>
                           <Button
                             size={"icon-sm"}
+                            variant={"outline"}
+                            className="size-6 rounded-full"
                             onClick={() => handleDecrementCount(item.id)}
                           >
                             <MinusIcon />
@@ -396,21 +507,88 @@ export default function Store() {
           <Card>
             <CardContent className="space-y-2">
               <Label>Name:</Label>
-              <Input placeholder="Customer Name" />
+              <Input
+                name="name"
+                placeholder="Customer Name"
+                value={customer.name}
+                onChange={handleChange}
+              />
+
               <Label className="mt-2">Contact:</Label>
-              <Input placeholder="Customer Contact" />
+              <Input
+                name="contact"
+                placeholder="Customer Contact"
+                value={customer.contact}
+                onChange={handleChange}
+              />
+
               <Label>Address:</Label>
-              <Input placeholder="Customer Address" />
+              <Input
+                name="address"
+                placeholder="Customer Address"
+                value={customer.address}
+                onChange={handleChange}
+              />
             </CardContent>
           </Card>
-          <div className="">
-            <Card>
-              <CardContent className="flex flex-col justify-center items-center gap-2">
-                <CreditCardIcon />
+          <div className="grid grid-cols-2 gap-4">
+            <Card
+              onClick={() => setPaymentMethod("card")}
+              className={cn(
+                paymentMethod === "card" &&
+                  "bg-primary/10 border border-primary",
+              )}
+            >
+              <CardContent className="flex flex-col text-primary justify-center items-center gap-2">
+                <CreditCardIcon className="size-8" />
                 <p>Card</p>
               </CardContent>
             </Card>
+            <Card
+              onClick={() => setPaymentMethod("cash")}
+              className={cn(
+                paymentMethod === "cash" &&
+                  "bg-primary/10 border border-primary",
+              )}
+            >
+              <CardContent className="flex flex-col text-primary justify-center items-center gap-2">
+                <HandCoinsIcon className="size-8" />
+                <p>Hand Cash</p>
+              </CardContent>
+            </Card>
           </div>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                className="w-full"
+                disabled={cart.length === 0 || !paymentMethod}
+              >
+                Create Invoice
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to create this invoice?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Please confirm that all the details are correct before
+                  proceeding.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    handleSubmitOrder();
+                  }}
+                >
+                  Confirm
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </section>

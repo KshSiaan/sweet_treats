@@ -8,6 +8,7 @@ import {
 
 import React from "react";
 import Store from "./store";
+import History from "./history";
 
 export default function page() {
   return (
@@ -20,7 +21,9 @@ export default function page() {
         <TabsContent value="1">
           <Store />
         </TabsContent>
-        <TabsContent value="2"></TabsContent>
+        <TabsContent value="2">
+          <History />
+        </TabsContent>
       </Tabs>
     </main>
   );

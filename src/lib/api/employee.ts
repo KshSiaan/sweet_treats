@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/base";
 import { howl } from "../utils";
-import { ProductType, StockType } from "@/types/dbs/employee";
+import { InvoiceType, ProductType, StockType } from "@/types/dbs/employee";
 import { CategoryType } from "@/types/dbs/business";
 
 
@@ -42,4 +42,34 @@ export async function getEmployeeProducts(
   product_category_id:string,
 ): Promise<ApiResponse<ProductType[]>> { 
   return howl(`/employee/get-products?product_category_id=${product_category_id}`, { token });
+}
+
+
+export async function createInvoiceApi(
+  token: string,
+  body:{
+  business_id: number
+  amount_info: {
+    sub_total: number
+    discount: number
+    total_amount: number
+  }
+  order_item: Array<{
+    product_id: number
+    product_name: string
+    product_price: number
+    quantity: number
+    unit?: string
+    count?: number
+  }>
+  payment_method: string
+}
+): Promise<ApiResponse<InvoiceType[]>> { 
+  return howl(`/employee/create-invoice`, { token,method:"POST",body });
+}
+
+export async function getInvoiceHistory(
+  token: string
+): Promise<ApiResponse<InvoiceType[]>> { 
+  return howl(`/employee/get-invoices`, { token });
 }
