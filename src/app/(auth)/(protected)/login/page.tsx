@@ -40,7 +40,7 @@ import { useCookies } from "react-cookie";
 const loginSchema = z.object({
   role: z.string(),
   email: z.email("Invalid email"),
-  password: z.string().min(6, "Minimum 6 characters"),
+  password: z.string(),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;

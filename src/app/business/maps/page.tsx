@@ -9,7 +9,7 @@ export default async function Page() {
   const map = await getBusinessMap(token);
 
   return (
-    <section>
+    <section className="overflow-hidden">
       <div className="mb-6">
         <h3 className="text-2xl font-semibold text-primary">
           Google Maps Integration

@@ -62,7 +62,7 @@ export default function MapEmbed({ embedCode }: MapEmbedProps) {
       <Label>Google Maps Embed Code</Label>
 
       <Textarea
-        className="resize-none"
+        className="resize-none max-w-[80dvw]"
         placeholder="Paste your Google Maps embed code here........"
         value={value}
         onChange={(e) => setValue(e.target.value)}

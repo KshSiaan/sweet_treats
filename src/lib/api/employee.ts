@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/base";
 import { howl } from "../utils";
-import { StockType } from "@/types/dbs/employee";
+import { ProductType, StockType } from "@/types/dbs/employee";
 import { CategoryType } from "@/types/dbs/business";
 
 
@@ -36,4 +36,10 @@ export async function getEmployeeCategories(
   updated_at: string
 }[]>> { 
   return howl(`/employee/product-category?business_category_id=${business_id}`, { token });
+}
+export async function getEmployeeProducts(
+  token: string,
+  product_category_id:string,
+): Promise<ApiResponse<ProductType[]>> { 
+  return howl(`/employee/get-products?product_category_id=${product_category_id}`, { token });
 }

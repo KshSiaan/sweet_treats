@@ -46,9 +46,7 @@ export default async function Page() {
           Customize how your store appears to customers.
         </p>
       </div>
-      <Suspense>
-        <DataController />
-      </Suspense>
+      <Suspense>{/* <DataController /> */}</Suspense>
     </section>
   );
 }

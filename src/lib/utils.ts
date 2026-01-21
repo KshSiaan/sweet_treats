@@ -34,6 +34,8 @@ export async function howl<T>(
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
+    console.log(errorData);
+    
     throw new Error((errorData as idk).message || "API request failed");
   }
 
