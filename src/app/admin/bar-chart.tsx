@@ -8,17 +8,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { AdminDashboardApiType } from "@/types/admin";
 
 export const description = "A bar chart";
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
 
 const chartConfig = {
   desktop: {
@@ -27,7 +19,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartBarDefault() {
+export function ChartBarDefault({
+  data,
+}: {
+  data: AdminDashboardApiType["business_category_bar"];
+}) {
+  const chartData = [
+    { month: "Rental", desktop: data?.rental ?? 0 },
+    { month: "Retail", desktop: data?.retail ?? 0 },
+    { month: "Labour Services", desktop: data?.labor_service ?? 0 },
+    { month: "Food Service", desktop: data?.food_service ?? 0 },
+    { month: "E-Commerce", desktop: data?.ecommerce ?? 0 },
+  ];
   return (
     <ChartContainer config={chartConfig} className="h-[200px]">
       <BarChart accessibilityLayer data={chartData}>

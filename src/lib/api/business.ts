@@ -1,6 +1,6 @@
 import { ApiResponse, Paginator } from "@/types/base";
 import { base_api, base_url, howl } from "../utils";
-import { BusinessDashboardType, BusinessMapType, CategoryType, EmployeeType, EventType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType } from "@/types/dbs/business";
+import { BusinessDashboardType, BusinessMapType, CategoryType, EmployeeType, EventType, FollowerType, ProductType, PromotionType, salaryType, StockType, StoreFrontType, TransactionType, withDrawHistoryType } from "@/types/dbs/business";
 
 
 
@@ -38,6 +38,12 @@ export async function getTransaction(
 ): Promise<ApiResponse<TransactionType>> {
   return howl(`/get-transactions`, { token });
 }
+export async function getWithdrawHistory(
+  token: string
+): Promise<ApiResponse<withDrawHistoryType>> {
+  return howl(`/my-withdraw-histories`, { token });
+}
+
 export async function getBusinessMap(
   token: string
 ): Promise<ApiResponse<BusinessMapType>> {

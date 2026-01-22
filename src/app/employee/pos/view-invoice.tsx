@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -18,17 +21,47 @@ import { getMeApi } from "@/lib/api/auth";
 import { InvoiceType } from "@/types/dbs/employee";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import React from "react";
+import React, { useRef } from "react";
 import { useCookies } from "react-cookie";
+import { useReactToPrint } from "react-to-print";
+import { toPng } from "html-to-image";
+import jsPDF from "jspdf";
 
 export default function ViewInvoice({ data }: { data: InvoiceType }) {
   const [{ token }] = useCookies(["token"]);
+  const invoiceRef = useRef<HTMLDivElement>(null);
   const { data: me, isPending } = useQuery({
     queryKey: ["me"],
     queryFn: () => {
       return getMeApi(token);
     },
   });
+
+  const handlePrint = useReactToPrint({
+    contentRef: invoiceRef,
+    documentTitle: `invoice-${data?.invoice_number}`,
+  });
+
+  const handleSavePDF = async () => {
+    if (invoiceRef.current) {
+      try {
+        const image = await toPng(invoiceRef.current);
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
+        const imgWidth = 210;
+        const imgHeight =
+          (invoiceRef.current.offsetHeight * imgWidth) /
+          invoiceRef.current.offsetWidth;
+        pdf.addImage(image, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.save(`invoice-${data?.invoice_number}.pdf`);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+      }
+    }
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -38,7 +71,7 @@ export default function ViewInvoice({ data }: { data: InvoiceType }) {
         <DialogHeader className="hidden">
           <DialogTitle></DialogTitle>
         </DialogHeader>
-        <div className="p-2">
+        <div ref={invoiceRef} className="p-2">
           <div className="grid grid-cols-2 gap-4 border-b pb-6">
             <div className="">
               <Image
@@ -104,13 +137,14 @@ export default function ViewInvoice({ data }: { data: InvoiceType }) {
           </div>
           <Table className="mt-6">
             <TableHeader className="bg-primary/30">
-              <TableRow></TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Unit</TableHead>
-              <TableHead>Qty</TableHead>
-              <TableHead>Unit Price</TableHead>
-              <TableHead>Amount</TableHead>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Unit</TableHead>
+                <TableHead>Qty</TableHead>
+                <TableHead>Unit Price</TableHead>
+                <TableHead>Amount</TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {data?.order_item.map((item, index) => (
@@ -127,7 +161,53 @@ export default function ViewInvoice({ data }: { data: InvoiceType }) {
               ))}
             </TableBody>
           </Table>
-          {/* TODO: COMPLETE THE REST OF THE INVOICE DETAILS */}
+          <div className="grid grid-cols-2 gap-4 pt-4">
+            <div></div>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <p className="font-semibold text-muted-foreground">Subtotal:</p>
+                <p className="font-semibold text-secondary-foreground">
+                  $
+                  {data?.order_item
+                    .reduce(
+                      (acc, item) => acc + item.product_price * item.quantity,
+                      0,
+                    )
+                    .toFixed(2)}
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="font-semibold text-muted-foreground">Discount:</p>
+                <p className="font-semibold text-secondary-foreground">
+                  ${data?.amount_info.discount.toFixed(2)}
+                </p>
+              </div>
+              <Separator />
+              <div className="flex justify-between text-xl">
+                <p className="font-semibold text-secondary-foreground">
+                  Total:
+                </p>
+                <p className="font-semibold text-secondary-foreground">
+                  ${(data?.amount_info.total_amount).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 items-end-safe">
+          <div className="text-muted-foreground">
+            <h4 className="text-xl font-semibold">
+              Thank you for your business!
+            </h4>
+            <p>
+              Notes: Goods sold are non-refundable unless defective. Powered by
+              Sweet Treats POS.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button onClick={() => handlePrint()}>Print</Button>
+            <Button onClick={handleSavePDF}>Save PDF</Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

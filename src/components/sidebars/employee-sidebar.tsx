@@ -44,11 +44,6 @@ const data = {
       url: `${prefix}/employee-wallet`,
       icon: GiftIcon,
     },
-    {
-      name: "My Statistics",
-      url: `${prefix}/stats`,
-      icon: ChartNetworkIcon,
-    },
 
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
     { name: "Log Out", url: `/logout`, icon: LogOutIcon },

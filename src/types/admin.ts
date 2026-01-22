@@ -1,13 +1,36 @@
 
 
 export interface AdminDashboardApiType{
-  users: number
-  events: number
-  branch: number
-  earning: string
-  recent_activities: {
-    current_page: number
-    data: Array<{
+    users: {
+      total: number
+      active: number
+      customers: number
+      businesses: number
+    }
+    wallet: {
+      total_balance: string
+      total_withdraw: string
+      total_earning: number
+    }
+    customer_satisfaction: {
+      percentage: number
+      max_rating: number
+    }
+    business_category_bar: {
+      retail: number
+      labor_service: number
+      food_service: number
+      rental: number
+      ecommerce: number
+    }
+    business_involved_pie: Array<{
+      id: number
+      name: string
+      description: string
+      business: number
+    }>
+    earning_curve: Array<any>
+    recent_activities: Array<{
       id: number
       date: string
       user: string
@@ -16,24 +39,7 @@ export interface AdminDashboardApiType{
       created_at: string
       updated_at: string
     }>
-    first_page_url: string
-    from: number
-    last_page: number
-    last_page_url: string
-    links: Array<{
-      url?: string
-      label: string
-      page?: number
-      active: boolean
-    }>
-    next_page_url: string
-    path: string
-    per_page: number
-    prev_page_url: any
-    to: number
-    total: number
   }
-}
 
 
 export interface AdminEventsApiType{

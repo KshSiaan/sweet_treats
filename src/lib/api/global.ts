@@ -76,7 +76,7 @@ export async function connectStripeAccount(token:string):Promise<{
     return howl(`/create-connected-account`,{token,method:"POST",body:{}});
 }
 
-export async function getGlobalUsers(token:string,type:"BUSINESS"|"CUSTOMER"|"EMPLOYEE"):Promise<ApiResponse<{
+export async function getGlobalUsers(token:string,type?:"BUSINESS"|"CUSTOMER"|"EMPLOYEE"):Promise<ApiResponse<{
     id: number
     full_name: string
     role: string
@@ -87,7 +87,7 @@ export async function getGlobalUsers(token:string,type:"BUSINESS"|"CUSTOMER"|"EM
       store_name?: string
     }
   }[]>>{
-    return howl(`/to-users?filter=${type}`,{token});
+    return howl(type?`/to-users?filter=${type}`:`/to-users`,{token});
 }
 export async function transferApi(token:string,body:{
   to:string,
@@ -119,4 +119,19 @@ export async function transferApi(token:string,body:{
     }
   }>>{
     return howl(`/transfer`,{token, method: "POST", body});
+}
+
+export async function createWithdraw(token:string,amount:number|string):Promise<ApiResponse<{
+        "user_id": number
+        "total_amount": number,
+        "withdrawal_amount_request": number,
+        "platform_fee": number,
+        "date": Date,
+        "updated_at": Date,
+        "created_at": Date,
+        "id": number
+    }[]>>{
+  return howl(`/withdraw`,{token,method:"POST",body:{
+    amount
+  }});
 }

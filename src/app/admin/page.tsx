@@ -22,59 +22,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cookies } from "next/headers";
+import { AdminDashboardApi } from "@/lib/api/admin";
 
-const dataset = [
-  {
-    title: "Total Users",
-    amm: 1247,
-    desc: "+12% from last month",
-    icon: FileTextIcon,
-  },
-  {
-    title: "Pending Approvals",
-    amm: 23,
-    desc: "Require attention",
-    icon: AlertTriangleIcon,
-  },
-  {
-    title: "Active Businesses",
-    amm: 342,
-    desc: "+8 new this week",
-    icon: DollarSignIcon,
-  },
-  {
-    title: "Content Flags",
-    amm: 17,
-    desc: "Need moderation",
-    icon: FlagIcon,
-  },
-  {
-    title: "New Registrations",
-    amm: 142,
-    desc: "+12% from last month",
-    icon: UserPlusIcon,
-  },
-  {
-    title: "Content Published",
-    amm: 2073,
-    desc: "+15% from previous period",
-    icon: FileBadgeIcon,
-  },
-  {
-    title: "Active Sessions",
-    amm: 342,
-    desc: "+8 new this week",
-    icon: UsersIcon,
-  },
-  {
-    title: "Moderation Actions",
-    amm: 324,
-    desc: "+8 new this week",
-    icon: GavelIcon,
-  },
-];
-
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value || "";
+  const data = await AdminDashboardApi(token);
+  const dataset = [
+    {
+      title: "Total Users",
+      amm: data?.data?.users?.total || 0,
+      desc: "+12% from last month",
+      icon: FileTextIcon,
+    },
+    {
+      title: "Total Customer",
+      amm: data?.data?.users?.customers || 0,
+      desc: "Require attention",
+      icon: AlertTriangleIcon,
+    },
+    {
+      title: "Total Balance",
+      amm: data?.data?.wallet?.total_balance || 0,
+      desc: "+8 new this week",
+      icon: DollarSignIcon,
+    },
+    {
+      title: "Total Earning",
+      amm: data?.data?.wallet?.total_earning || 0,
+      desc: "Need moderation",
+      icon: FlagIcon,
+    },
+    {
+      title: "Active Users",
+      amm: data?.data?.users?.active || 0,
+      desc: "+12% from last month",
+      icon: UserPlusIcon,
+    },
+    {
+      title: "Total Businesses",
+      amm: data?.data?.users?.businesses || 0,
+      desc: "+15% from previous period",
+      icon: FileBadgeIcon,
+    },
+    {
+      title: "Total Withdraw",
+      amm: data?.data?.wallet?.total_withdraw || 0,
+      desc: "+8 new this week",
+      icon: UsersIcon,
+    },
+    {
+      title: "Customer Satisfaction",
+      amm: data?.data?.customer_satisfaction?.max_rating || 0,
+      desc: "+8 new this week",
+      icon: GavelIcon,
+    },
+  ];
   return (
     <div className="w-full h-full flex flex-col gap-6">
       <h3 className="text-2xl font-semibold text-primary ">Dashboard</h3>
@@ -109,30 +112,30 @@ export default function Page() {
             </div>
           </div>
           <div className="flex-1 w-full flex justify-center items-center pt-6">
-            <ChartBarDefault />
+            <ChartBarDefault data={data?.data?.business_category_bar} />
           </div>
         </div>
         <div className="flex-1 rounded-xl p-6 border bg-background!">
           <div className="flex w-full justify-between items-center gap-2">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Moderation Activity</h3>
+              <h3 className="font-semibold">Earning Curve</h3>
             </div>
           </div>
           <div className="w-full gap-6 items-center">
             <div className="">
-              <AreaChartBlock />
+              <AreaChartBlock data={data?.data?.earning_curve} />
             </div>
           </div>
         </div>
         <div className="flex-1 rounded-xl p-6 border bg-background!">
           <div className="flex w-full justify-between items-center gap-2">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Content Distribution</h3>
+              <h3 className="font-semibold">Category Distribution</h3>
             </div>
           </div>
           <div className="w-full gap-6 items-center">
             <div className="">
-              <ChartPieDonut />
+              <ChartPieDonut data={data?.data?.business_involved_pie} />
             </div>
           </div>
         </div>
@@ -146,23 +149,29 @@ export default function Page() {
             <TableRow>
               <TableHead className="text-primary! text-center">Time</TableHead>
               <TableHead className="text-primary! text-center">User</TableHead>
-              <TableHead className="text-primary! text-center">Items</TableHead>
+              <TableHead className="text-primary! text-center">
+                Action
+              </TableHead>
               <TableHead className="text-primary! text-center">
                 Details
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="text-center">10:24 AM</TableCell>
-              <TableCell className="text-center">Sarah Johnson</TableCell>
-              <TableCell className="text-center">
-                Business Registration
-              </TableCell>
-              <TableCell className="text-center">
-                "Coffee Corner" - Pending review
-              </TableCell>
-            </TableRow>
+            {data?.data?.recent_activities?.map((activity, index) => (
+              <TableRow>
+                <TableCell className="text-center">
+                  {new Date(activity?.date).toDateString()}
+                </TableCell>
+                <TableCell className="text-center">{activity?.user}</TableCell>
+                <TableCell className="text-center">
+                  {activity?.action}
+                </TableCell>
+                <TableCell className="text-center">
+                  {activity?.details}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>

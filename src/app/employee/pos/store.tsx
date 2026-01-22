@@ -60,6 +60,7 @@ export default function Store() {
     contact: "",
     address: "",
   });
+  const [discount, setDiscount] = React.useState<number>(0);
 
   // fetch ONCE
   const { data, isError } = useQuery({
@@ -180,8 +181,8 @@ export default function Store() {
       business_id: cart[0]?.business_id,
       amount_info: {
         sub_total: subTotal,
-        discount: 0,
-        total_amount: subTotal,
+        discount,
+        total_amount: subTotal - discount,
       },
       customer_info: {
         name: customer.name,
@@ -486,19 +487,27 @@ export default function Store() {
                     .toFixed(2)}
                 </span>
               </p>
+              <div className="space-y-2 mt-4 grid grid-cols-2 items-center">
+                <Label className="text-base">Discount:</Label>
+                <Input
+                  className=""
+                  name="discount"
+                  placeholder="Discount Amount"
+                  type="number"
+                  value={String(discount)}
+                  onChange={(e) => setDiscount(parseFloat(e.target.value))}
+                />
+              </div>
             </CardContent>
             <CardFooter className="border-t">
               <p className="flex justify-between w-full text-xl items-center font-semibold">
                 <span>Total:</span>
                 <span className="">
                   $
-                  {cart
-                    .reduce(
-                      (acc, item) =>
-                        acc + parseFloat(item.price) * item.quantity,
-                      0,
-                    )
-                    .toFixed(2)}
+                  {cart.reduce(
+                    (acc, item) => acc + parseFloat(item.price) * item.quantity,
+                    0,
+                  ) - discount}
                 </span>
               </p>
             </CardFooter>

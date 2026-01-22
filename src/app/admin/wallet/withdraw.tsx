@@ -24,25 +24,6 @@ export default function Withdraw({ token }: { token: string | undefined }) {
   if (!token) {
     return null;
   }
-  const { data, isPending } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => getMeApi(token),
-    enabled: !!token,
-  });
-  const { mutate, isPending: isMutating } = useMutation({
-    mutationKey: ["connect_stripe_acc"],
-    mutationFn: () => {
-      return connectStripeAccount(token);
-    },
-    onError: (err) => {
-      toast.error(err.message ?? "Failed to complete this request");
-      console.log(err);
-    },
-    onSuccess: (res) => {
-      toast.success("Redirecting to Stripe to complete onboarding");
-      window.location.href = res.onboarding_url;
-    },
-  });
 
   const { mutate: withdraw, isPending: withdrawing } = useMutation({
     mutationKey: ["withdraw"],
@@ -58,26 +39,6 @@ export default function Withdraw({ token }: { token: string | undefined }) {
     },
   });
 
-  if (!data?.data.user.stripe_account_id) {
-    return (
-      <Button
-        className="bg-blue-500"
-        onClick={() => {
-          mutate();
-        }}
-        disabled={isPending || isMutating}
-      >
-        {isPending || isMutating ? (
-          "Loading..."
-        ) : (
-          <>
-            <PlusIcon />
-            Withdraw {data?.data.user.stripe_account_id}
-          </>
-        )}
-      </Button>
-    );
-  }
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -86,7 +47,7 @@ export default function Withdraw({ token }: { token: string | undefined }) {
           Withdraw
         </Button>
       </DialogTrigger>
-      <DialogContent className="p-0! ">
+      <DialogContent className="p-0!">
         <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
           <DialogTitle>Withdraw</DialogTitle>
         </DialogHeader>

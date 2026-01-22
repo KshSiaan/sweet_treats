@@ -6,11 +6,9 @@ import type { BranchType, BusinessUserType, CashVerificationType, EventWinner, L
 
 export async function AdminDashboardApi(
   token: string,
-  page: number = 1,
-  perPage: number = 2
 ): Promise<ApiResponse<AdminDashboardApiType>> {
   return howl(
-    `/admin/dashboard-info?page=${page}&per_page=${perPage}`,
+    `/admin/get-admin-dashboard-info`,
     { token }
   );
 }
@@ -43,4 +41,66 @@ export async function approveAdminContent(token:string, id: number):Promise<ApiR
 }
 export async function removeAdminContent(token:string, id: number):Promise<ApiResponse<AdminContenttype>>{ 
     return howl(`/admin/remove/${id}`, { token,method:"DELETE" });
+}
+
+export async function getAdminWithdrawRequest(
+  token: string
+): Promise<ApiResponse<{
+    id: number
+    user_id: number
+    total_amount: string
+    date: string
+    status: string
+    created_at: string
+    updated_at: string
+    user: {
+      id: number
+      full_name: string
+      role: string
+      avatar_url: string
+    }
+  }[]>> {
+  return howl(`/admin/get-withdraw-requests`, { token });
+}
+
+export async function acceptWithdrawRequest(token: string, id: number): Promise<ApiResponse<{
+    id: number
+    user_id: number
+    total_amount: string
+    date: string
+    status: string
+    created_at: string
+    updated_at: string
+    user: {
+      id: number
+      full_name: string
+      role: string
+      avatar_url: string
+    }
+  }>> {
+  return howl(`/admin/request-accept/${id}`, {
+    token,
+    method: "PATCH",
+  });
+}
+
+export async function rejectWithdrawRequest(token: string, id: number): Promise<ApiResponse<{
+    id: number
+    user_id: number
+    total_amount: string
+    date: string
+    status: string
+    created_at: string
+    updated_at: string
+    user: {
+      id: number
+      full_name: string
+      role: string
+      avatar_url: string
+    }
+  }>> {
+  return howl(`/admin/request-decline/${id}`, {
+    token,
+    method: "PATCH",
+  });
 }

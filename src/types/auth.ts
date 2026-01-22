@@ -8,25 +8,44 @@ export interface loginResponse{
 
 export interface UserType {
   id: number
-  full_name?: string
-  user_name?: string
-  connected_account_id?: string
+  full_name: string
   role: string
   email: string
-  email_verified_at?: string
+  email_verified_at: string
   status: string
-  otp_verified_at?: string
-  otp?: string
-  otp_expires_at?: string
-  phone_number?: string
-  address?: string
-  avatar?: string
-  instagram_link?: string
-  country?: string
-  google_id?: string
+  otp_verified_at: any
+  otp: string
+  otp_expires_at: string
+  phone_number: any
+  address: any
+  avatar: string
+  google_id: any
+  facebook_id: any
+  stripe_account_id: string
+  fingerprint_id: any
   created_at: string
   updated_at: string
-  avatar_url?: string
+  avatar_url: string
+  profile: {
+    id: number
+    user_id: number
+    store_name: string
+    store_location: string
+    latitude: string
+    longitude: string
+    store_open: any
+    store_close: any
+    store_description: any
+    shipping_type: any
+    product_delivery_cost: string
+    wallet_balance: string
+    total_withdraw: string
+    reward_point: number
+    gender: any
+    age: any
+    created_at: string
+    updated_at: string
+  }
 }
 
 export interface BusinessUserType{

@@ -149,7 +149,33 @@ export interface FollowerType {
       total: number
     }
   }
-
+export interface withDrawHistoryType {
+    user: {
+      id: number
+      full_name: string
+      email: string
+      role: string
+      status: string
+    }
+    my_withdraw_histories: Array<{
+      id: number
+      user_id: number
+      total_amount: string
+      withdrawal_amount_request: string
+      platform_fee: string
+      date: string
+      status: string
+      created_at: string
+      updated_at: string
+      user: {
+        id: number
+        full_name: string
+        role: string
+        email: string
+        avatar_url: string
+      }
+    }>
+  }
 export interface BusinessMapType {
   id: number
   business_id: number

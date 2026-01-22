@@ -8,11 +8,12 @@ import Wallet from "./wallet";
 import { getTransaction, getWithdrawHistory } from "@/lib/api/business";
 import { cookies } from "next/headers";
 import History from "./history";
+import { getAdminWithdrawRequest } from "@/lib/api/admin";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
   const data = await getTransaction(token!);
-  const withdrawData = await getWithdrawHistory(token!);
+  const withdrawData = await getAdminWithdrawRequest(token!);
   return (
     <section>
       <div className="mb-6">
@@ -24,7 +25,7 @@ export default async function Page() {
       <Tabs defaultValue="wallet">
         <TabsList>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
-          <TabsTrigger value="history">Withdraw History</TabsTrigger>
+          <TabsTrigger value="history">Withdraw Requests</TabsTrigger>
         </TabsList>
         <TabsContent value="wallet">
           <Wallet data={data} />

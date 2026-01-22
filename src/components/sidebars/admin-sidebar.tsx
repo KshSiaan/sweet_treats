@@ -41,19 +41,24 @@ const data = {
     { name: "Dashboard", url: `${prefix}`, icon: LayoutDashboardIcon },
     { name: "Category", url: `${prefix}/category`, icon: ShapesIcon },
     { name: "User Management", url: `${prefix}/users`, icon: Users2Icon }, // Use a standard Users/User Management Icon
-    {
-      name: "Reward Management",
-      url: `${prefix}/reward`,
-      icon: GiftIcon,
-    },
+    // {
+    //   name: "Reward Management",
+    //   url: `${prefix}/reward`,
+    //   icon: GiftIcon,
+    // },
     {
       name: "Business Accounts",
       url: `${prefix}/companies`,
       icon: TargetIcon,
     },
+    // {
+    //   name: "Subscription",
+    //   url: `${prefix}/subscription`,
+    //   icon: CoinsIcon,
+    // },
     {
-      name: "Subscription",
-      url: `${prefix}/subscription`,
+      name: "Wallet System",
+      url: `${prefix}/wallet`,
       icon: CoinsIcon,
     },
     {

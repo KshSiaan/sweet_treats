@@ -73,3 +73,23 @@ export async function getInvoiceHistory(
 ): Promise<ApiResponse<InvoiceType[]>> { 
   return howl(`/employee/get-invoices`, { token });
 }
+
+export async function employeeDashboardStats(
+  token: string
+): Promise<ApiResponse<{
+  "total_online_sales": number,
+  "total_in_store_sales": number,
+  "total_sales": number,
+  "incoming_orders": number,
+  "pending_orders": number,
+  "conpleted_orders": number
+}>> {
+  return howl(`/employee/dashboard-info`, { token });
+}
+
+export async function getRecentOrders(
+  token: string,
+  filter:'Pending' | 'Canceled' | 'In Progress' | 'Ready' | 'On The Way' | 'Delivery Accepted',
+): Promise<ApiResponse<any>> { 
+  return howl(`/employee/get-orders?filter=${filter}`, { token });
+}
