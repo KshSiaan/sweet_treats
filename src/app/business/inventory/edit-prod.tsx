@@ -161,21 +161,23 @@ export default function EditProd({ data: currData }: { data: ProductType }) {
                       <SelectItem value={String(category.id)} key={category.id}>
                         {category.name}
                       </SelectItem>
-                    ))
+                    )),
                 )}
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label>Stock</Label>
-              <Input
-                placeholder="Enter quantity"
-                type="number"
-                {...register("stock")}
-              />
-            </div>
+            {currData?.unit ? null : (
+              <div>
+                <Label>Stock</Label>
+                <Input
+                  placeholder="Enter quantity"
+                  type="number"
+                  {...register("stock")}
+                />
+              </div>
+            )}
             <div>
               <Label>Price</Label>
               <Input
@@ -185,13 +187,34 @@ export default function EditProd({ data: currData }: { data: ProductType }) {
               />
             </div>
           </div>
-          <div>
-            <Label>Unit</Label>
-            <Input placeholder="Enter unit" type="text" {...register("unit")} />
-            <p className="text-sm text-muted-foreground mt-1">
-              Rental: hour, day, month | Retailer: kg, gm
-            </p>
-          </div>
+          {parseInt(String(currData?.stock ?? "0")) ? null : (
+            <div>
+              <Label>Unit</Label>
+              <Select
+                value={watch("unit")}
+                onValueChange={(value) => setValue("unit", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={"Select unit"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {String(currData?.business_category_id) === "4" ||
+                  String(currData?.business_category_id) === "2" ? (
+                    <>
+                      <SelectItem value="hour">Hour</SelectItem>
+                      <SelectItem value="day">Day</SelectItem>
+                      <SelectItem value="month">Month</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="kg">Kilogram (kg)</SelectItem>
+                      <SelectItem value="gm">Gram (gm)</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label>Description</Label>

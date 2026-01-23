@@ -269,6 +269,7 @@ export interface PromotionType {
     target_products: any
     created_at: string
     updated_at: string
+    is_promotion_started?: boolean
   }
 
   export interface EventType {

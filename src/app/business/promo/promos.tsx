@@ -72,16 +72,23 @@ export default function Promos() {
                     <h4 className="text-lg font-semibold ">Duration</h4>
                     <p>{new Date(item?.ending_date).toLocaleDateString()}</p>
                   </div>
-                  <div className="">
-                    <h4 className="text-lg font-semibold ">Discount</h4>
-                    <p>{item?.discount_value}%</p>
-                  </div>
+                  {item?.type !== "Buy1Get1" && (
+                    <div className="">
+                      <h4 className="text-lg font-semibold ">Discount</h4>
+                      <p>
+                        {item?.discount_value}
+                        {item?.type === "Discount" ? "%" : ""}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
-              <CardFooter className="space-x-4">
-                <EditPromo data={item} />
-                <DelPromo data={item} />
-              </CardFooter>
+              {!item?.is_promotion_started && (
+                <CardFooter className="space-x-4">
+                  <EditPromo data={item} />
+                  <DelPromo data={item} />
+                </CardFooter>
+              )}
             </Card>
           ))
         )}

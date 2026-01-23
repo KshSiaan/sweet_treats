@@ -60,7 +60,13 @@ export default function AddProd() {
 
   const handleDrop = (files: File[]) => setFiles(files);
 
-  const { register, handleSubmit, watch, setValue } = useForm<AddItemForm>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset: resetForm,
+  } = useForm<AddItemForm>({
     resolver: zodResolver(addItemSchema),
     defaultValues: {
       product_name: "",
@@ -72,6 +78,9 @@ export default function AddProd() {
       description: "",
     },
   });
+  const businessCategory = watch("business_category_id");
+  const unit = watch("unit");
+  const stock = watch("stock");
   const { mutate, isPending } = useMutation({
     mutationKey: ["add-product"],
     mutationFn: (body: FormData) => {
@@ -162,21 +171,23 @@ export default function AddProd() {
                       <SelectItem value={String(category.id)} key={category.id}>
                         {category.name}
                       </SelectItem>
-                    ))
+                    )),
                 )}
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label>Stock</Label>
-              <Input
-                placeholder="Enter quantity"
-                type="number"
-                {...register("stock")}
-              />
-            </div>
+            {unit === "" && (
+              <div>
+                <Label>Stock</Label>
+                <Input
+                  placeholder="Enter quantity"
+                  type="number"
+                  {...register("stock")}
+                />
+              </div>
+            )}
             <div>
               <Label>Price</Label>
               <Input
@@ -186,13 +197,33 @@ export default function AddProd() {
               />
             </div>
           </div>
-          <div>
-            <Label>Unit</Label>
-            <Input placeholder="Enter unit" type="text" {...register("unit")} />
-            <p className="text-sm text-muted-foreground mt-1">
-              Rental: hour, day, month | Retailer: kg, gm
-            </p>
-          </div>
+          {stock === "" && (
+            <div>
+              <Label>Unit</Label>
+              <Select
+                value={watch("unit")}
+                onValueChange={(value) => setValue("unit", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={"Select unit"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {businessCategory === "4" || businessCategory === "2" ? (
+                    <>
+                      <SelectItem value="hour">Hour</SelectItem>
+                      <SelectItem value="day">Day</SelectItem>
+                      <SelectItem value="month">Month</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="kg">Kilogram (kg)</SelectItem>
+                      <SelectItem value="gm">Gram (gm)</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label>Description</Label>
@@ -218,6 +249,17 @@ export default function AddProd() {
           </div>
 
           <DialogFooter className="p-4 flex justify-end gap-2">
+            <Button
+              variant={"ghost"}
+              type="button"
+              onClick={() => {
+                resetForm();
+                setFiles([]);
+                setValue("unit", "");
+              }}
+            >
+              Reset
+            </Button>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>

@@ -98,6 +98,7 @@ export default function AddEvent() {
       target_products: [],
     },
   });
+  const isOnline = form.watch("is_online");
   const to12Hour = (time: string): string => {
     if (!time) return "";
 
@@ -224,13 +225,25 @@ export default function AddEvent() {
             </div>
           </RadioGroup>
 
-          <Label>Conference Link</Label>
-          <Input
-            placeholder="Enter Conference Link"
-            {...form.register("conference_link")}
-          />
-          <Label>Location</Label>
-          <Input placeholder="Enter Location" {...form.register("location")} />
+          {isOnline && (
+            <>
+              <Label>Conference Link</Label>
+              <Input
+                placeholder="Enter Conference Link"
+                {...form.register("conference_link")}
+              />
+            </>
+          )}
+          {!isOnline && (
+            <>
+              <Label>Location</Label>
+              <Input
+                placeholder="Enter Location"
+                {...form.register("location")}
+              />
+            </>
+          )}
+
           <Label>Description</Label>
           <Textarea
             placeholder="Enter event description"

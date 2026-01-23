@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -44,17 +44,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { toDDMMYYYY } from "@/lib/funcs";
 import { BusinessCategory } from "@/types/dbs/business";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   title: z.string().min(1),
-  business_category_id: z.string().min(1),
+  business_category_id: z.string().optional(),
   type: z.string().min(1),
   discount_value: z.string().min(1),
   starting_date: z.string().min(1),
   ending_date: z.string().min(1),
   description: z.string().min(1),
-  target_category_id: z.string().min(1),
-  is_specific: z.boolean(),
+  use_code: z.string().optional(),
+  target_category_id: z.string().optional(),
+  is_specific: z.boolean().optional(),
   target_products: z.array(z.string()).optional(),
 });
 
@@ -65,7 +67,7 @@ export default function AddPromo() {
   const qcl = useQueryClient();
   const [isSpecificProduct, setIsSpecificProduct] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-
+  const navig = useRouter();
   const { data, isPending } = useQuery({
     queryKey: ["products", token],
     queryFn: () => getProducts(token),
@@ -83,6 +85,9 @@ export default function AddPromo() {
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
       qcl.invalidateQueries({ queryKey: ["promotions"] });
+      form.reset();
+      setFiles([]);
+      navig.refresh();
     },
   });
 
@@ -102,6 +107,7 @@ export default function AddPromo() {
     },
   });
   const business_cat = form.watch("business_category_id");
+  const promoType = form.watch("type");
   const BUSINESS_CATEGORY_MAP: Record<string, BusinessCategory> = {
     "1": "retail",
     "2": "labor_service",
@@ -126,19 +132,22 @@ export default function AddPromo() {
     formData.append("business_category_id", values.business_category_id ?? "1");
     formData.append("title", values.title);
     formData.append("type", values.type);
+
+    if (values.type === "Coupon" || values.type === "Voucher") {
+      formData.append("use_code", values.use_code ?? "");
+    } else {
+      formData.append("target_category_id", values.target_category_id ?? "");
+      formData.append("is_specific", values.is_specific ? "1" : "0");
+      if (values.is_specific && selectedProducts.length > 0) {
+        selectedProducts.forEach((id, index) => {
+          formData.append(`target_products[${index}]`, id);
+        });
+      }
+    }
     formData.append("discount_value", values.discount_value);
     formData.append("starting_date", toDDMMYYYY(values.starting_date));
     formData.append("ending_date", toDDMMYYYY(values.ending_date));
     formData.append("description", values.description);
-    formData.append("target_category_id", values.target_category_id ?? "");
-    formData.append("is_specific", values.is_specific ? "1" : "0");
-
-    if (values.is_specific && selectedProducts.length > 0) {
-      selectedProducts.forEach((id, index) => {
-        formData.append(`target_products[${index}]`, id);
-      });
-    }
-
     if (files && files.length > 0) {
       formData.append("image", files[0]);
     }
@@ -203,7 +212,12 @@ export default function AddPromo() {
             </div>
 
             <div className="space-y-2">
-              <Label>Discount Value</Label>
+              <Label>
+                Discount{" "}
+                {promoType === "Coupon" || promoType === "Voucher"
+                  ? "Amount"
+                  : "Value"}
+              </Label>
               <Input
                 placeholder="e.g. 20"
                 {...form.register("discount_value")}
@@ -221,112 +235,133 @@ export default function AddPromo() {
               <Input type="date" {...form.register("ending_date")} />
             </div>
           </div>
+          {promoType === "Coupon" || promoType === "Voucher" ? (
+            <>
+              <Label>Use Code</Label>
+              <Input placeholder="Type Code" {...form.register("use_code")} />
+            </>
+          ) : (
+            <>
+              <Label>Business Category</Label>
+              <Select
+                onValueChange={(v) => form.setValue("business_category_id", v)}
+                defaultValue="1"
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Retail</SelectItem>
+                  <SelectItem value="2">Labor Service</SelectItem>
+                  <SelectItem value="3">Food Service</SelectItem>
+                  <SelectItem value="4">Rental</SelectItem>
+                  <SelectItem value="5">Ecommerce</SelectItem>
+                </SelectContent>
+              </Select>
+              <Label>Target Category</Label>
+              <Select
+                onValueChange={(v) => form.setValue("target_category_id", v)}
+                defaultValue="1"
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {!catPending &&
+                    categoryKey &&
+                    cats?.data?.[categoryKey]?.map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
 
-          <Label>Business Category</Label>
-          <Select
-            onValueChange={(v) => form.setValue("business_category_id", v)}
-            defaultValue="1"
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Retail</SelectItem>
-              <SelectItem value="2">Labor Service</SelectItem>
-              <SelectItem value="3">Food Service</SelectItem>
-              <SelectItem value="4">Rental</SelectItem>
-              <SelectItem value="5">Ecommerce</SelectItem>
-            </SelectContent>
-          </Select>
-          <Label>Target Category</Label>
-          <Select
-            onValueChange={(v) => form.setValue("target_category_id", v)}
-            defaultValue="1"
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {!catPending &&
-                categoryKey &&
-                cats?.data?.[categoryKey]?.map((item) => (
-                  <SelectItem key={item.id} value={String(item.id)}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
+              <Label>Do you want specific product offer?</Label>
+              <RadioGroup
+                className="flex gap-4"
+                onValueChange={(v) => {
+                  const yes = v === "yes";
+                  setIsSpecificProduct(yes);
+                  form.setValue("is_specific", yes);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem
+                    value="yes"
+                    id="yes"
+                    className="border-primary"
+                  />
+                  <Label htmlFor="yes">Yes</Label>
+                </div>
 
-          <Label>Do you want specific product offer?</Label>
-          <RadioGroup
-            className="flex gap-4"
-            onValueChange={(v) => {
-              const yes = v === "yes";
-              setIsSpecificProduct(yes);
-              form.setValue("is_specific", yes);
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="yes" id="yes" className="border-primary" />
-              <Label htmlFor="yes">Yes</Label>
-            </div>
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem
+                    value="no"
+                    id="no"
+                    className="border-primary"
+                  />
+                  <Label htmlFor="no">No</Label>
+                </div>
+              </RadioGroup>
 
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="no" id="no" className="border-primary" />
-              <Label htmlFor="no">No</Label>
-            </div>
-          </RadioGroup>
+              {isSpecificProduct && (
+                <div>
+                  <Label>Select Product</Label>
 
-          {isSpecificProduct && (
-            <div>
-              <Label>Select Product</Label>
+                  {isPending ? (
+                    <div>Loading...</div>
+                  ) : data?.data?.data?.length === 0 ? (
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia>
+                          <UploadCloudIcon className="w-12 h-12 text-muted-foreground" />
+                        </EmptyMedia>
+                        <EmptyTitle>No Products Found</EmptyTitle>
+                      </EmptyHeader>
+                    </Empty>
+                  ) : (
+                    data?.data?.data?.map((product: any) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-2 border-b p-2"
+                      >
+                        <Checkbox
+                          checked={selectedProducts.includes(
+                            String(product.id),
+                          )}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              const arr = [
+                                ...selectedProducts,
+                                String(product.id),
+                              ];
+                              setSelectedProducts(arr);
+                              form.setValue("target_products", arr);
+                            } else {
+                              const arr = selectedProducts.filter(
+                                (id) => id !== String(product.id),
+                              );
+                              setSelectedProducts(arr);
+                              form.setValue("target_products", arr);
+                            }
+                          }}
+                        />
 
-              {isPending ? (
-                <div>Loading...</div>
-              ) : data?.data?.data?.length === 0 ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <UploadCloudIcon className="w-12 h-12 text-muted-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>No Products Found</EmptyTitle>
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                data?.data?.data?.map((product: any) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center gap-2 border-b p-2"
-                  >
-                    <Checkbox
-                      checked={selectedProducts.includes(String(product.id))}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          const arr = [...selectedProducts, String(product.id)];
-                          setSelectedProducts(arr);
-                          form.setValue("target_products", arr);
-                        } else {
-                          const arr = selectedProducts.filter(
-                            (id) => id !== String(product.id),
-                          );
-                          setSelectedProducts(arr);
-                          form.setValue("target_products", arr);
-                        }
-                      }}
-                    />
-
-                    <div>
-                      <p className="font-semibold text-primary">
-                        {product.product_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        ${product.price}
-                      </p>
-                    </div>
-                  </div>
-                ))
+                        <div>
+                          <p className="font-semibold text-primary">
+                            {product.product_name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            ${product.price}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
 
           <Label>Description</Label>

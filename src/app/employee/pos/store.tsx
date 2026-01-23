@@ -354,6 +354,9 @@ export default function Store() {
                       <p>&nbsp;</p>
                     )}
                     <div className="text-muted-foreground text-sm">
+                      Stock: {product.stock}
+                    </div>
+                    <div className="text-muted-foreground text-sm">
                       {product?.rating} ⭐ ({product?.rating_count} Reviews)
                     </div>
                   </CardContent>
@@ -363,13 +366,17 @@ export default function Store() {
                       onClick={() => handleAddToCart(product)}
                       disabled={
                         product.id ===
-                        cart.find((item) => item.id === product.id)?.id
+                          cart.find((item) => item.id === product.id)?.id ||
+                        product.stock === 0 ||
+                        !product.stock
                       }
                     >
                       {product.id ===
                       cart.find((item) => item.id === product.id)?.id
                         ? "Added to cart"
-                        : "Add to Cart"}
+                        : product.stock === 0 || !product.stock
+                          ? "Out of stock"
+                          : "Add to Cart"}
                     </Button>
                   </CardFooter>
                 </Card>
