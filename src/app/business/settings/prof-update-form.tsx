@@ -9,30 +9,48 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { updateMeApi } from "@/lib/api/auth";
+import { UserType } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
-  name: z.string(),
-  email: z.string(),
-  address: z.string(),
+  full_name: z.string(),
+  store_location: z.string(),
 });
-export default function ProfUpdateForm() {
+export default function ProfUpdateForm({ data }: { data: UserType }) {
+  const navig = useRouter();
+  const [{ token }] = useCookies(["token"]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "Raven",
-      email: "example@email.com",
-      address: "New York",
+      full_name: data.full_name || "",
+      store_location: data?.profile?.store_location || data?.address || "",
+    },
+  });
+  const { mutate } = useMutation({
+    mutationKey: ["update_profile"],
+    mutationFn: (body: { full_name?: string; store_location?: string }) => {
+      return updateMeApi(token, body);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (res) => {
+      toast.success(res.message ?? "Success!");
+      navig.refresh();
     },
   });
 
   function submitter(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.success("Your profile data is updated");
+    mutate(values);
   }
 
   return (
@@ -44,7 +62,7 @@ export default function ProfUpdateForm() {
         <form className="!space-y-6" onSubmit={form.handleSubmit(submitter)}>
           <FormField
             control={form.control}
-            name="name"
+            name="full_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Full name</FormLabel>
@@ -55,22 +73,13 @@ export default function ProfUpdateForm() {
               </FormItem>
             )}
           />{" "}
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input readOnly value={data.email} />
+          </div>
           <FormField
             control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="email@email.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />{" "}
-          <FormField
-            control={form.control}
-            name="address"
+            name="store_location"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Location</FormLabel>
@@ -81,7 +90,13 @@ export default function ProfUpdateForm() {
               </FormItem>
             )}
           />
-          <Button className="w-full !mt-6">Update Profile</Button>
+          <Button
+            className="w-full !mt-6"
+            type="submit"
+            disabled={!form.formState.isDirty}
+          >
+            Update Profile
+          </Button>
         </form>
       </Form>
     </div>

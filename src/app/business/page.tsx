@@ -129,7 +129,7 @@ export default function Page() {
           </TableHeader>
           <TableBody>
             {data?.data?.recent_order_activity?.map((order) => (
-              <TableRow>
+              <TableRow key={order.id}>
                 <TableCell className="text-center">
                   {order.order_number}
                 </TableCell>

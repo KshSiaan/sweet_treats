@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/types/base";
-import { howl } from "../utils";
+import { base_api, base_url, howl } from "../utils";
 import { loginResponse, UserType } from "@/types/auth";
 
 
@@ -19,9 +19,28 @@ export async function changePasswordApi({password,password_confirmation,token}:{
 export async function getMeApi(token:string):Promise<ApiResponse<{user:UserType}>>{
     return howl(`/get-profile`,{token});
 }
-export async function updateMeApi(token:string,body:FormData):Promise<ApiResponse<{user:UserType}>>{
-    return howl(`/edit-profile`,{token,body,method:"POST"});
+export async function updateMeApi(token:string,body:{full_name?:string,store_location?:string}):Promise<ApiResponse<{user:UserType}>>{
+    return howl(`/personalization`,{token,body,method:"POST"});
 }
+export async function updateAvatar(
+  token: string,
+  body: FormData
+): Promise<ApiResponse<{ user: UserType }>> {
+  const res = await fetch(`${base_url}${base_api}/personalization`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update avatar");
+  }
+
+  return res.json();
+}
+
 
 export async function updatePass(token:string,body:{
     current_password: string;

@@ -1,22 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import {
   Table,
@@ -34,6 +18,7 @@ import { notFound } from "next/navigation";
 import Approve from "./approve";
 import Remove from "./remove";
 import { Suspense } from "react";
+import ViewContent from "./view-content";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
@@ -108,101 +93,7 @@ export default async function Page() {
                     )}
                   </TableCell>
                   <TableCell className="text-center gap-2! space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline">View</Button>
-                      </DialogTrigger>
-                      <DialogContent className="p-0!">
-                        <DialogHeader className="bg-gradient-to-r from-primary to-[#FF7C36] p-4 rounded-t-lg text-background">
-                          <DialogTitle>User Details</DialogTitle>
-                        </DialogHeader>
-                        <div className="w-full grid grid-cols-2 gap-6 p-4">
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Content Type
-                            </h5>
-                            <p className="text-muted-foreground text-sm">
-                              Review
-                            </p>
-                          </div>
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Flags
-                            </h5>
-                            <p className="text-muted-foreground text-sm">3</p>
-                          </div>
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Author
-                            </h5>
-                            <p className="text-muted-foreground text-sm">
-                              Sarah Johnson
-                            </p>
-                          </div>
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Flag Reasons
-                            </h5>
-                            <ul className="list-disc list-inside">
-                              <li className="text-muted-foreground text-sm">
-                                In appropriate language
-                              </li>
-                              <li className="text-muted-foreground text-sm">
-                                False information
-                              </li>
-                              <li className="text-muted-foreground text-sm">
-                                Harassment
-                              </li>
-                            </ul>
-                          </div>
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Status
-                            </h5>
-                            <Badge className="rounded-full border-none bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 focus-visible:outline-none dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
-                              <span
-                                className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-                                aria-hidden="true"
-                              />
-                              Approved
-                            </Badge>
-                          </div>
-                          <div className="space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              User Type
-                            </h5>
-                            <Select>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="customer">
-                                  Customer
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="col-span-2 space-y-2">
-                            <h5 className="text-xl font-semibold text-muted-foreground">
-                              Account Notes
-                            </h5>
-                            <Textarea
-                              className="resize-none"
-                              readOnly
-                              placeholder="Add notes about ths user....."
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter className="p-4 pt-0!">
-                          <DialogClose asChild>
-                            <Button variant={"outline"} className="px-6">
-                              Close
-                            </Button>
-                          </DialogClose>
-                          <Button className="px-6">Save Notes</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <ViewContent data={content} />
                     {content.status === "Under Review" && (
                       <>
                         <Suspense>

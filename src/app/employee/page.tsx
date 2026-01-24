@@ -3,7 +3,6 @@ import {
   DollarSignIcon,
   FileTextIcon,
   HandCoinsIcon,
-
 } from "lucide-react";
 
 import { cookies } from "next/headers";

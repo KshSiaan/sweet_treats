@@ -3,6 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { getMeApi } from "@/lib/api/auth";
+import { base_url } from "@/lib/utils";
 import { BellIcon, SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -14,6 +16,13 @@ export default async function Layout({
 }>) {
   const token = (await cookies()).get("token")?.value;
   if (!token) {
+    return notFound();
+  }
+  const me = await getMeApi(token);
+  if (!me?.data?.user) {
+    return notFound();
+  }
+  if (me.data.user.role !== "EMPLOYEE") {
     return notFound();
   }
   return (
@@ -38,13 +47,19 @@ export default async function Layout({
               </Button>
               <div className="flex flex-row gap-4 justify-center items-center">
                 <Avatar>
-                  <AvatarImage src={"https://avatar.iran.liara.run/public"} />
+                  <AvatarImage
+                    src={
+                      me?.data?.user?.avatar
+                        ? `${base_url}${me?.data?.user?.avatar}`
+                        : "https://avatar.iran.liara.run/public"
+                    }
+                  />
                   <AvatarFallback>UI</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col justify-center items-start">
-                  <p className="font-semibold">Admin User</p>
+                  <p className="font-semibold">{me.data.user.full_name}</p>
                   <p className="text-muted-foreground text-xs">
-                    admin@gmail.com
+                    {me.data.user.email}
                   </p>
                 </div>
               </div>

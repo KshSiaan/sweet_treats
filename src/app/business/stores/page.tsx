@@ -20,11 +20,11 @@ export default async function Page() {
           </video>
         </div>
       )}
-      {data?.images?.length > 0 && (
+      {Array.isArray(data?.images) && data.images.length > 0 && (
         <div className="mb-6 space-y-4">
           <h3 className="text-2xl font-semibold text-primary ">Store Images</h3>
           <div className="w-full grid grid-cols-3 gap-6">
-            {data?.images.map((image, i) => (
+            {data.images.map((image, i) => (
               <Image
                 className="w-full aspect-video rounded-lg shadow object-contain"
                 src={`${base_url}${image}`}
@@ -46,7 +46,9 @@ export default async function Page() {
           Customize how your store appears to customers.
         </p>
       </div>
-      <Suspense>{/* <DataController /> */}</Suspense>
+      <Suspense>
+        <DataController />
+      </Suspense>
     </section>
   );
 }

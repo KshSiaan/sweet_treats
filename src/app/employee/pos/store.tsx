@@ -353,9 +353,20 @@ export default function Store() {
                     ) : (
                       <p>&nbsp;</p>
                     )}
-                    <div className="text-muted-foreground text-sm">
-                      Stock: {product.stock}
-                    </div>
+                    {product?.stock ? (
+                      <div className="text-muted-foreground text-sm">
+                        Stock: {product.stock}
+                      </div>
+                    ) : (
+                      <div className="flex flex-row justify-between gap-2">
+                        <div className="text-muted-foreground text-sm">
+                          Unit: {product.unit}
+                        </div>
+                        <div className="text-muted-foreground text-sm text-end">
+                          Availablity: {product.availability}
+                        </div>
+                      </div>
+                    )}
                     <div className="text-muted-foreground text-sm">
                       {product?.rating} ⭐ ({product?.rating_count} Reviews)
                     </div>
@@ -365,18 +376,20 @@ export default function Store() {
                       className="w-full"
                       onClick={() => handleAddToCart(product)}
                       disabled={
-                        product.id ===
-                          cart.find((item) => item.id === product.id)?.id ||
-                        product.stock === 0 ||
-                        !product.stock
+                        (typeof product.stock === "number" &&
+                          product.stock <= 0) ||
+                        product?.availability === "Not-available"
                       }
                     >
                       {product.id ===
                       cart.find((item) => item.id === product.id)?.id
                         ? "Added to cart"
-                        : product.stock === 0 || !product.stock
+                        : product.stock <= 0 &&
+                            typeof product.stock === "number"
                           ? "Out of stock"
-                          : "Add to Cart"}
+                          : product?.availability === "Not-available"
+                            ? "Not Available"
+                            : "Add to Cart"}
                     </Button>
                   </CardFooter>
                 </Card>

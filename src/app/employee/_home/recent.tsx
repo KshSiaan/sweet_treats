@@ -45,7 +45,9 @@ export default function Recent() {
               <Loader2Icon className={`animate-spin`} />
             </div>
           ) : (
-            <Orders data={data} />
+            <Orders
+            // data={data}
+            />
           )}
         </TabsContent>
       </Tabs>

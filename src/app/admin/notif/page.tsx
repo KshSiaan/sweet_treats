@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import React from "react";
 
-export default function Page() {
+export default async function Page() {
   return (
     <section className="w-full h-full">
       <Card>

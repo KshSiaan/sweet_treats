@@ -1,4 +1,3 @@
-"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { EditIcon } from "lucide-react";
@@ -14,13 +13,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { cookies } from "next/headers";
+import { getMeApi } from "@/lib/api/auth";
+import AvatarUpdater from "./avatar_updater";
+import { base_url } from "@/lib/utils";
+import PassUpdater from "./pass-updater";
 
-export default function Page() {
+export default async function Page() {
+  const token = (await cookies()).get("token")?.value || "";
+  const me = await getMeApi(token);
   return (
     <div className="!pb-12 !py-12 border rounded-xl">
       <div className="flex flex-row justify-center items-center">
         <Avatar className="size-[140px] relative overflow-visible">
-          <AvatarImage src="https://avatar.iran.liara.run/public" />
+          <AvatarImage
+            src={
+              me?.data?.user?.avatar
+                ? `${base_url}${me?.data?.user?.avatar}`
+                : "https://placehold.co/400"
+            }
+            className="object-cover rounded-full"
+          />
           <AvatarFallback>AV</AvatarFallback>
           <Button
             className="absolute bottom-0 right-0 z-30"
@@ -33,41 +46,14 @@ export default function Page() {
             >
               <EditIcon />
             </label>
-            <Input
-              id="imageUpload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-            />
+            <AvatarUpdater />
           </Button>
         </Avatar>
       </div>
       <div className="">
-        <ProfUpdateForm />
+        <ProfUpdateForm data={me?.data?.user} />
         <div className="px-6 w-full">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="w-full" variant={"outline"}>
-                Update password from here
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader className="pb-4 border-b">
-                <DialogTitle>Change Password</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Label>Current Password</Label>
-                <Input />
-                <Label>New Password</Label>
-                <Input />
-                <Label>Confirm Password</Label>
-                <Input />
-              </div>
-              <DialogFooter className="mt-6">
-                <Button className="w-full">Update Password</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <PassUpdater />
         </div>
       </div>
     </div>

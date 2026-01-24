@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/types/base"
+import { ApiResponse, Paginator } from "@/types/base"
 import { howl } from "../utils"
 
 
@@ -134,4 +134,28 @@ export async function createWithdraw(token:string,amount:number|string):Promise<
   return howl(`/withdraw`,{token,method:"POST",body:{
     amount
   }});
+}
+
+export async function getNotifications(token:string):Promise<ApiResponse<Paginator<{
+      id: string
+      type: string
+      notifiable_type: string
+      notifiable_id: number
+      data: {
+        title: string
+        is_body_use: boolean
+        body: string
+      }
+      read_at: any
+      created_at: string
+      updated_at: string
+    }[]>>>{
+  return howl(`/get-notifications`,{token});
+}
+
+export async function markNotifAsRead(token:string,notifId:string):Promise<ApiResponse<{message:string}>>{
+  return howl(`/read?notification_id=${notifId}`,{token,method:"PATCH"});
+}
+export async function markAllNotifAsRead(token:string):Promise<ApiResponse<{message:string}>>{
+  return howl(`/read-all`,{token,method:"PATCH"});
 }

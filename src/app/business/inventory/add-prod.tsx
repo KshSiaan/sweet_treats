@@ -19,7 +19,7 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addProduct, getCategories } from "@/lib/api/business";
 import { useCookies } from "react-cookie";
 
@@ -43,6 +43,7 @@ const addItemSchema = z.object({
   price: z.string().optional(),
   unit: z.string().optional(),
   stock: z.string().optional(),
+  availability: z.string().optional(),
   description: z.string().optional(),
 });
 
@@ -50,6 +51,7 @@ type AddItemForm = z.infer<typeof addItemSchema>;
 
 export default function AddProd() {
   const [{ token }] = useCookies(["token"]);
+  const qcl = useQueryClient();
   const navig = useRouter();
   const { data } = useQuery({
     queryKey: ["categories"],
@@ -91,6 +93,12 @@ export default function AddProd() {
     },
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
+      qcl.invalidateQueries({
+        queryKey: ["products"],
+      });
+      resetForm();
+      setFiles([]);
+      setValue("unit", "");
       navig.refresh();
     },
   });
@@ -178,7 +186,25 @@ export default function AddProd() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {unit === "" && (
+            {unit === "" ||
+            businessCategory === "4" ||
+            businessCategory === "2" ? (
+              <div>
+                <Label>Availablity</Label>
+                <Select
+                  onValueChange={(value) => setValue("availability", value)}
+                  value={watch("availability")}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Availablity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Available">Available</SelectItem>
+                    <SelectItem value="Not-available">Not-available</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
               <div>
                 <Label>Stock</Label>
                 <Input
