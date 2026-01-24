@@ -221,30 +221,31 @@ export default function AddProd() {
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            {unit !== "" ? (
+            {stock === "" && (
               <div>
-                <Label>Availablity</Label>
+                <Label>Unit</Label>
                 <Select
-                  onValueChange={(value) => setValue("availability", value)}
-                  value={watch("availability")}
+                  value={watch("unit")}
+                  onValueChange={(value) => setValue("unit", value)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Availablity" />
+                    <SelectValue placeholder={"Select unit"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Available">Available</SelectItem>
-                    <SelectItem value="Not-available">Not-available</SelectItem>
+                    {businessCategory === "4" || businessCategory === "2" ? (
+                      <>
+                        <SelectItem value="hour">Hour</SelectItem>
+                        <SelectItem value="day">Day</SelectItem>
+                        <SelectItem value="month">Month</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="kg">Kilogram (kg)</SelectItem>
+                        <SelectItem value="gm">Gram (gm)</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
-              </div>
-            ) : (
-              <div>
-                <Label>Stock</Label>
-                <Input
-                  placeholder="Enter quantity"
-                  type="number"
-                  {...register("stock")}
-                />
               </div>
             )}
             <div>
@@ -256,31 +257,31 @@ export default function AddProd() {
               />
             </div>
           </div>
-          {stock === "" && (
+
+          {unit !== "" ? (
             <div>
-              <Label>Unit</Label>
+              <Label>Availablity</Label>
               <Select
-                value={watch("unit")}
-                onValueChange={(value) => setValue("unit", value)}
+                onValueChange={(value) => setValue("availability", value)}
+                value={watch("availability")}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={"Select unit"} />
+                  <SelectValue placeholder="Select Availablity" />
                 </SelectTrigger>
                 <SelectContent>
-                  {businessCategory === "4" || businessCategory === "2" ? (
-                    <>
-                      <SelectItem value="hour">Hour</SelectItem>
-                      <SelectItem value="day">Day</SelectItem>
-                      <SelectItem value="month">Month</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="kg">Kilogram (kg)</SelectItem>
-                      <SelectItem value="gm">Gram (gm)</SelectItem>
-                    </>
-                  )}
+                  <SelectItem value="Available">Available</SelectItem>
+                  <SelectItem value="Not-available">Not-available</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          ) : (
+            <div>
+              <Label>Stock</Label>
+              <Input
+                placeholder="Enter quantity"
+                type="number"
+                {...register("stock")}
+              />
             </div>
           )}
 
