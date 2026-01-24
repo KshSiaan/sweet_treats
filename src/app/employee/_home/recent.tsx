@@ -12,44 +12,57 @@ import { getRecentOrders } from "@/lib/api/employee";
 import Orders from "./pending";
 import { Loader2Icon } from "lucide-react";
 
+const TAB_VALUES = [
+  "Pending",
+  "Canceled",
+  "In Progress",
+  "Ready",
+  "On The Way",
+  "Delivery Accepted",
+] as const;
+
+type TabValue = (typeof TAB_VALUES)[number];
+
 export default function Recent() {
   const [{ token }] = useCookies(["token"]);
-  const [activeTab, setActiveTab] = React.useState<
-    | "Pending"
-    | "Canceled"
-    | "In Progress"
-    | "Ready"
-    | "On The Way"
-    | "Delivery Accepted"
-  >("Pending");
+  const [activeTab, setActiveTab] = React.useState<TabValue>("Pending");
   const { data, isPending } = useQuery({
     queryKey: ["recent-orders", activeTab],
     queryFn: () => {
       return getRecentOrders(token, activeTab);
     },
   });
+
+  const renderContent = () => (
+    <>
+      {isPending ? (
+        <div className={`flex justify-center items-center h-24 mx-auto`}>
+          <Loader2Icon className={`animate-spin`} />
+        </div>
+      ) : (
+        <Orders data={data?.data ?? []} />
+      )}
+    </>
+  );
+
   return (
     <div className="w-full">
-      <Tabs>
+      <Tabs
+        defaultValue="Pending"
+        onValueChange={(val) => setActiveTab(val as TabValue)}
+      >
         <TabsList>
-          <TabsTrigger value="Pending">Pending</TabsTrigger>
-          <TabsTrigger value="Canceled">Canceled</TabsTrigger>
-          <TabsTrigger value="In Progress">In Progress</TabsTrigger>
-          <TabsTrigger value="Ready">Ready</TabsTrigger>
-          <TabsTrigger value="On The Way">On The Way</TabsTrigger>
-          <TabsTrigger value="Delivery Accepted">Delivery Accepted</TabsTrigger>
+          {TAB_VALUES.map((tab) => (
+            <TabsTrigger key={tab} value={tab}>
+              {tab}
+            </TabsTrigger>
+          ))}
         </TabsList>
-        <TabsContent value="Pending">
-          {isPending ? (
-            <div className={`flex justify-center items-center h-24 mx-auto`}>
-              <Loader2Icon className={`animate-spin`} />
-            </div>
-          ) : (
-            <Orders
-            // data={data}
-            />
-          )}
-        </TabsContent>
+        {TAB_VALUES.map((tab) => (
+          <TabsContent key={tab} value={tab}>
+            {renderContent()}
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );

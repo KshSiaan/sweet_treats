@@ -90,6 +90,39 @@ export async function employeeDashboardStats(
 export async function getRecentOrders(
   token: string,
   filter:'Pending' | 'Canceled' | 'In Progress' | 'Ready' | 'On The Way' | 'Delivery Accepted',
-): Promise<ApiResponse<any>> { 
-  return howl(`/employee/get-orders?filter=${filter}`, { token });
+): Promise<ApiResponse<{
+  id: number
+  order_number: string
+  customer_id: number
+  business_id: number
+  order_date: string
+  amount_info: {
+    sub_total: number
+    shipping_cost: number
+    discount: number
+    total_amount: number
+  }
+  order_item: Array<{
+    product_id: number
+    business_category_id: number
+    product_category_id: number
+    product_name: string
+    product_price: number
+    quantity: number
+  }>
+  shipping_info: {
+    name: string
+    address: string
+    city: string
+    zip: number
+    phone_number: string
+  }
+  payment_method: string
+  status: string
+  assign_employee_id: number
+  transaction_id: any
+  created_at: string
+  updated_at: string
+}[]>> { 
+  return howl(`/employee/get-orders?filter=${encodeURIComponent(filter)}`, { token });
 }
