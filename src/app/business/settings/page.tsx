@@ -3,16 +3,7 @@ import { Button } from "@/components/ui/button";
 import { EditIcon } from "lucide-react";
 import React from "react";
 import ProfUpdateForm from "./prof-update-form";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+
 import { cookies } from "next/headers";
 import { getMeApi } from "@/lib/api/auth";
 import AvatarUpdater from "./avatar_updater";

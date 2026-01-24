@@ -78,11 +78,45 @@ export default function AddProd() {
       price: "",
       unit: "",
       description: "",
+      availability: "Available",
     },
   });
   const businessCategory = watch("business_category_id");
   const unit = watch("unit");
   const stock = watch("stock");
+
+  // Ensure unit and stock are mutually exclusive and drive visibility
+  React.useEffect(() => {
+    if (unit && unit !== "") {
+      setValue("stock", "");
+    }
+  }, [unit, setValue]);
+
+  React.useEffect(() => {
+    if (stock && stock !== "") {
+      setValue("unit", "");
+      setValue("availability", "");
+    }
+  }, [stock, setValue]);
+
+  // Map selected business category to the correct child categories key
+  const categoryKeyMap: Record<string, string> = {
+    "1": "retail",
+    "2": "labor_service",
+    "3": "food_service",
+    "4": "rental",
+    "5": "ecommerce",
+  };
+
+  const selectedCategoryKey = categoryKeyMap[businessCategory ?? ""];
+  const productCategories = selectedCategoryKey
+    ? ((data?.data as any)?.[selectedCategoryKey] ?? [])
+    : [];
+
+  // When business category changes, clear previously chosen product category
+  React.useEffect(() => {
+    setValue("product_category_id", "");
+  }, [businessCategory, setValue]);
   const { mutate, isPending } = useMutation({
     mutationKey: ["add-product"],
     mutationFn: (body: FormData) => {
@@ -163,32 +197,31 @@ export default function AddProd() {
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label>Product Category</Label>
-            <Select
-              onValueChange={(value) => setValue("product_category_id", value)}
-              value={watch("product_category_id")}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Product Category" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(data?.data || {}).map(
-                  ([categoryKey, categories]) =>
-                    categories.map((category) => (
-                      <SelectItem value={String(category.id)} key={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    )),
-                )}
-              </SelectContent>
-            </Select>
-          </div>
+          {productCategories.length > 0 && (
+            <div>
+              <Label>Product Category</Label>
+              <Select
+                onValueChange={(value) =>
+                  setValue("product_category_id", value)
+                }
+                value={watch("product_category_id")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Product Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {productCategories.map((category: any) => (
+                    <SelectItem value={String(category.id)} key={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-2">
-            {unit === "" ||
-            businessCategory === "4" ||
-            businessCategory === "2" ? (
+            {unit !== "" ? (
               <div>
                 <Label>Availablity</Label>
                 <Select
