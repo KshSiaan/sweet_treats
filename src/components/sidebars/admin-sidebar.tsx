@@ -3,6 +3,7 @@ import React from "react";
 import {
   BookCopyIcon,
   CoinsIcon,
+  FileCogIcon,
   GiftIcon,
   LayoutDashboardIcon,
   LogOutIcon,
@@ -67,6 +68,11 @@ const data = {
       icon: BookCopyIcon,
     },
     { name: "Settings", url: `${prefix}/settings`, icon: SettingsIcon },
+    {
+      name: "Legal Pages ",
+      url: `${prefix}/settings/legal`,
+      icon: FileCogIcon,
+    },
     { name: "Log Out", url: `/logout`, icon: LogOutIcon },
   ],
 };

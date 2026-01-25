@@ -104,3 +104,31 @@ export async function rejectWithdrawRequest(token: string, id: number): Promise<
     method: "PATCH",
   });
 }
+
+export async function getPage(key: string):Promise<ApiResponse<{
+  slug: string
+  title: string
+  content: string
+  updated_at: string
+  created_at: string
+  id: number
+}>>{
+  return howl(`/pages/${key}`)
+}
+
+export async function updatePage(token:string, key: string,body:{title:string, content:string}):Promise<ApiResponse<{
+  slug: string
+  title: string
+  content: string
+  updated_at: string
+  created_at: string
+  id: number
+}>>{
+  return howl(`/pages/${key}`,{
+    token,
+    method:"POST",
+    body:{
+      ...body
+    }
+  })
+}
