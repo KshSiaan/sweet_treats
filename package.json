@@ -39,6 +39,7 @@
     "html-to-image": "^1.11.13",
     "html2pdf.js": "^0.14.0",
     "input-otp": "^1.4.2",
+    "isomorphic-dompurify": "^2.35.0",
     "jspdf": "^4.0.0",
     "lucide-react": "^0.546.0",
     "next": "15.5.6",
