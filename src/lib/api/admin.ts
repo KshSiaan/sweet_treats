@@ -1,5 +1,5 @@
 
-import type { AdminContenttype, AdminDashboardApiType} from "@/types/admin";
+import type { AdminContenttype, AdminDashboardApiType, claimType, RewardType} from "@/types/admin";
 import { howl } from "../utils";
 import type { ApiResponse, Paginator } from "@/types/base";
 import type { BranchType, BusinessUserType, CashVerificationType, EventWinner, LeaderboardType, PaymentType, RefundType, TeamType, TransactionsApi, UserType } from "@/types/auth";
@@ -113,7 +113,12 @@ export async function getPage(key: string):Promise<ApiResponse<{
   created_at: string
   id: number
 }>>{
-  return howl(`/pages/${key}`)
+  return howl(`/pages/${key}`,{
+    headers:{
+      "Cache-Control":"no-store",
+      "cache": "no-store"
+    }
+  })
 }
 
 export async function updatePage(token:string, key: string,body:{title:string, content:string}):Promise<ApiResponse<{
@@ -131,4 +136,42 @@ export async function updatePage(token:string, key: string,body:{title:string, c
       ...body
     }
   })
+}
+
+export async function getRules(token:string):Promise<ApiResponse<{
+    id: number
+    activity_name: string
+    days: Array<string>
+    points_per_dollar: number
+    status: string
+    created_at: string
+    updated_at: string
+  }[]>>{
+  return howl(`/admin/get-rules`, { token });
+}
+export async function updateRules(token:string,id:number|string,body:any){
+  return howl(`/admin/update-rule/${id}?_method=PATCH`, { token,body, method:"POST" });
+}
+export async function getRewards(token:string):Promise<ApiResponse<RewardType[]>>{
+  return howl(`/admin/get-rewards`, { token });
+}
+export async function addRewards(token:string,body:any):Promise<ApiResponse<RewardType>>{
+  return howl(`/admin/add-reward`, { token,body, method:"POST" });
+}
+export async function editRewardById(token:string,id:number|string,body:any):Promise<ApiResponse<RewardType>>{
+  return howl(`/admin/edit-reward/${id}?_method=PATCH`, { token,body, method:"POST" });
+}
+export async function deleteReward(token:string,id:number|string):Promise<ApiResponse<RewardType>>{
+  return howl(`/admin/delete-reward/${id}`, { token, method:"DELETE" });
+}
+
+
+export async function getClaims(token:string):Promise<ApiResponse<claimType[]>>{
+  return howl(`/admin/get-claim-requests`, { token });
+}
+export async function acceptClaim(token:string,id:number|string):Promise<ApiResponse<claimType>>{
+  return howl(`/admin/claim-accepted/${id}`, { token, method:"PATCH" });
+}
+export async function cancelClaim(token:string,id:number|string):Promise<ApiResponse<claimType>>{
+  return howl(`/admin/claim-cancel/${id}`, { token, method:"PATCH" });
 }

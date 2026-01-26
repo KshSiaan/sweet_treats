@@ -14,7 +14,7 @@ export const description = "A bar chart";
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "value: ",
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
@@ -25,11 +25,11 @@ export function ChartBarDefault({
   data: AdminDashboardApiType["business_category_bar"];
 }) {
   const chartData = [
-    { month: "Rental", desktop: data?.rental ?? 0 },
-    { month: "Retail", desktop: data?.retail ?? 0 },
-    { month: "Labour Services", desktop: data?.labor_service ?? 0 },
-    { month: "Food Service", desktop: data?.food_service ?? 0 },
-    { month: "E-Commerce", desktop: data?.ecommerce ?? 0 },
+    { month: "Rental", value: data?.rental ?? 0 },
+    { month: "Retail", value: data?.retail ?? 0 },
+    { month: "Labour Services", value: data?.labor_service ?? 0 },
+    { month: "Food Service", value: data?.food_service ?? 0 },
+    { month: "E-Commerce", value: data?.ecommerce ?? 0 },
   ];
   return (
     <ChartContainer config={chartConfig} className="h-[200px]">
@@ -44,9 +44,13 @@ export function ChartBarDefault({
         />
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent hideLabel />}
+          // content={<ChartTooltipContent />}
+          // formatter={(value) => [
+          //   value,
+          //   chartData.find((d) => d.desktop === value)?.month || "Unknown",
+          // ]}
         />
-        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
+        <Bar dataKey="value" fill="var(--color-desktop)" radius={8} />
       </BarChart>
     </ChartContainer>
   );

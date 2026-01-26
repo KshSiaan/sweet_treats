@@ -99,3 +99,37 @@ export interface AdminContenttype{
       avatar_url: string
     }
   }
+
+  export interface RewardType{
+  id: number
+  points: number
+  amount_usd: number
+  description: string
+  status: string
+  created_at: string
+  updated_at: string
+}
+export interface claimType{
+  id: number
+  point_conversion_rule_id: number
+  customer_id: number
+  customer_name: string
+  phone: string
+  amount: string
+  status: string
+  created_at: string
+  updated_at: string
+  customer: {
+    id: number
+    full_name: string
+    role: string
+    avatar_url: string
+  }
+  point_conversion_rule: {
+    id: number
+    points: number
+    amount_usd: number
+    description: string
+    status: string
+  }
+}
