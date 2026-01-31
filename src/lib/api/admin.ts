@@ -175,3 +175,31 @@ export async function acceptClaim(token:string,id:number|string):Promise<ApiResp
 export async function cancelClaim(token:string,id:number|string):Promise<ApiResponse<claimType>>{
   return howl(`/admin/claim-cancel/${id}`, { token, method:"PATCH" });
 }
+
+
+
+export async function allWithdraws(token:string,):Promise<ApiResponse<{
+  available_stripe_balance: number
+  pending_stripe_balance: number
+  message: string
+  user_top_up_histories: Array<{
+    id: number
+    user_id: number
+    deposit_amount: string
+    net_topup_amount: string
+    processing_fee_amount: string
+    date: string
+    status: string
+    created_at: string
+    updated_at: string
+    user: {
+      id: number
+      full_name: string
+      role: string
+      email: string
+      avatar_url: string
+    }
+  }>
+}>>{
+  return howl(`/admin/get-user-top-up-histories`, { token});
+}

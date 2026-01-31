@@ -25,26 +25,26 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getGlobalUsers, transferApi } from "@/lib/api/global";
+import { fundApi, getGlobalUsers, transferApi } from "@/lib/api/global";
 import { useCookies } from "react-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useStripeInformation } from "@/lib/store/stripe";
 
 // 1️⃣ Zod Schema
 const transferSchema = z.object({
   to: z.string().min(1, "Recipient is required"),
   amount: z.string().min(1, "Amount is required"),
-  purpose: z.string(),
-  descripton: z.string().optional(),
 });
 
 type TransferFormValues = z.infer<typeof transferSchema>;
 
-export default function Transfer() {
+export default function TempFund() {
   const [{ token }] = useCookies(["token"]);
+  const { setPaymentInfo } = useStripeInformation();
   const navig = useRouter();
-  const { data, isPending } = useQuery({
-    queryKey: ["user_list", "business"],
+  const { data } = useQuery({
+    queryKey: ["user_list"],
     queryFn: async () => {
       return getGlobalUsers(token);
     },
@@ -62,22 +62,24 @@ export default function Transfer() {
     defaultValues: {
       to: "",
       amount: "",
-      purpose: "Transfer",
-      descripton: "",
     },
   });
   const { mutate, isPending: transferring } = useMutation({
-    mutationKey: ["transfer"],
+    mutationKey: ["fund_user"],
     mutationFn: (body: TransferFormValues) => {
-      return transferApi(token, body);
+      return fundApi(token, body.to, { amount: body.amount });
     },
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
     },
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
-      navig.refresh();
-      reset();
+      setPaymentInfo({
+        paymentIntent: res.data.id,
+        clientSecret: res.data.client_secret,
+        amount: res.data.amount,
+      });
+      navig.push("/admin/wallet/fund");
     },
   });
 
@@ -87,14 +89,10 @@ export default function Transfer() {
 
   return (
     <Dialog>
-      <DialogTrigger disabled asChild>
-        <Button
-          // disabled={isPending}
-          disabled
-          variant={"outline"}
-        >
+      <DialogTrigger asChild>
+        <Button>
           <PlusIcon />
-          Transfer
+          Add Fund
         </Button>
       </DialogTrigger>
       <DialogContent className="p-0!">
@@ -128,24 +126,6 @@ export default function Transfer() {
           {errors.amount && (
             <p className="text-red-500 text-sm">{errors.amount.message}</p>
           )}
-
-          <Label>Purpose</Label>
-          <Select onValueChange={(val) => setValue("purpose", val)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Method" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Transfer">Transfer</SelectItem>
-              <SelectItem value="Loan">Loan</SelectItem>
-              <SelectItem value="Gift">Gift</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.purpose && (
-            <p className="text-red-500 text-sm">{errors.purpose.message}</p>
-          )}
-
-          <Label>Description (Optional)</Label>
-          <Textarea {...register("descripton")} />
         </form>
         <DialogFooter className="p-4">
           <DialogClose asChild>

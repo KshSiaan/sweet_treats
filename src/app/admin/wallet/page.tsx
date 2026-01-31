@@ -9,6 +9,7 @@ import { getTransaction, getWithdrawHistory } from "@/lib/api/business";
 import { cookies } from "next/headers";
 import History from "./history";
 import { getAdminWithdrawRequest } from "@/lib/api/admin";
+import Temp from "./temp";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
@@ -26,12 +27,16 @@ export default async function Page() {
         <TabsList>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
           <TabsTrigger value="history">Withdraw Requests</TabsTrigger>
+          <TabsTrigger value="manual">Manual Top up</TabsTrigger>
         </TabsList>
         <TabsContent value="wallet">
           <Wallet data={data} />
         </TabsContent>
         <TabsContent value="history">
           <History data={withdrawData.data} />
+        </TabsContent>
+        <TabsContent value="manual">
+          <Temp />
         </TabsContent>
       </Tabs>
     </section>
