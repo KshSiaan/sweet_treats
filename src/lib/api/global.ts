@@ -80,6 +80,7 @@ export async function getGlobalUsers(token:string,type?:"BUSINESS"|"CUSTOMER"|"E
     id: number
     full_name: string
     role: string
+    email:string
     avatar_url: string
     profile: {
       id: number

@@ -36,21 +36,21 @@ export default function Temp() {
       <div className="grid grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Available Stripe Balance:</CardTitle>
+            <CardTitle>Pending Stripe Balance:</CardTitle>
           </CardHeader>
           <CardContent>
             <h2 className="font-bold text-5xl">
-              ${data?.data?.available_stripe_balance}
+              ${data?.data?.pending_stripe_balance}
             </h2>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>pending_stripe_balance:</CardTitle>
+            <CardTitle>Available Stripe Balance:</CardTitle>
           </CardHeader>
           <CardContent>
             <h2 className="font-bold text-5xl">
-              ${data?.data?.pending_stripe_balance}
+              ${data?.data?.available_stripe_balance}
             </h2>
           </CardContent>
         </Card>
