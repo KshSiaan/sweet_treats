@@ -106,7 +106,7 @@ export default function Transfer() {
             <SelectContent>
               {data?.data.map((user) => (
                 <SelectItem key={user.id} value={String(user.id)}>
-                  {user.profile.store_name || user.full_name}
+                  {user.profile.store_name || user.full_name} - ({user.email})
                 </SelectItem>
               ))}
             </SelectContent>
