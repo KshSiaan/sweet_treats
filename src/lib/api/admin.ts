@@ -83,6 +83,26 @@ export async function acceptWithdrawRequest(token: string, id: number): Promise<
     method: "PATCH",
   });
 }
+export async function payWithdrawAmount(token: string, id: number): Promise<ApiResponse<{
+    id: number
+    user_id: number
+    total_amount: string
+    date: string
+    status: string
+    created_at: string
+    updated_at: string
+    user: {
+      id: number
+      full_name: string
+      role: string
+      avatar_url: string
+    }
+  }>> {
+  return howl(`/admin/pay-withdraw-amount/${id}`, {
+    token,
+    method: "PATCH",
+  });
+}
 
 export async function rejectWithdrawRequest(token: string, id: number): Promise<ApiResponse<{
     id: number

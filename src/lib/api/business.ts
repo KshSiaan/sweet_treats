@@ -28,6 +28,12 @@ export async function addCategory(
 ): Promise<ApiResponse<CategoryType>> {
   return howl(`/business/product-category`, { token , body, method: "POST" });
 }
+export async function delCategory(
+  token: string,
+  id: string|number,
+): Promise<ApiResponse<CategoryType>> {
+  return howl(`/business/product-category/${id}`, { token ,method: "DELETE" });
+}
 export async function getFollowers(
   token: string
 ): Promise<ApiResponse<FollowerType[]>> {

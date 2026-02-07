@@ -1,10 +1,10 @@
 
-export interface ApiResponse<T>{
-    status:boolean,
-    message:string,
-    data:T
+export interface ApiResponse<T> {
+    status: boolean,
+    message: string,
+    data: T
 }
-export interface Paginator<T>{
+export interface Paginator<T> {
     current_page: number
     data: T,
     next_page_url: any
@@ -13,4 +13,5 @@ export interface Paginator<T>{
     prev_page_url: any
     to: number
     total: number
-  }
+}
+//

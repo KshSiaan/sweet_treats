@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getCategories } from "@/lib/api/business";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import { cookies } from "next/headers";
 import React from "react";
 import CategoryAdd from "./category-add";
+
+import DelCat from "./del-cat";
 
 export default async function Page() {
   const token = (await cookies()).get("token")?.value;
@@ -44,10 +46,13 @@ export default async function Page() {
               <CardContent className="space-y-4 text-sm font-semibold text-muted-foreground flex-1">
                 {categories.map((category) => (
                   <div
-                    className="p-2 bg-secondary rounded-lg shadow"
+                    className="p-2 px-4 bg-secondary rounded-lg shadow flex justify-between items-center"
                     key={category.id}
                   >
-                    {category.name}
+                    <div className="">{category.name}</div>
+                    <div className="">
+                      <DelCat cat={category} />
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -57,7 +62,7 @@ export default async function Page() {
                 />
               </CardFooter>
             </Card>
-          )
+          ),
         )}
       </div>
     </section>
