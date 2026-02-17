@@ -23,7 +23,7 @@ import { z } from "zod";
 
 const formSchema = z.object({
   full_name: z.string(),
-  store_location: z.string(),
+  // store_location: z.string(),
 });
 export default function ProfUpdateForm({ data }: { data: UserType }) {
   const navig = useRouter();
@@ -32,7 +32,7 @@ export default function ProfUpdateForm({ data }: { data: UserType }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       full_name: data.full_name || "",
-      store_location: data?.profile?.store_location || data?.address || "",
+      // store_location: data?.profile?.store_location || data?.address || "",
     },
   });
   const { mutate } = useMutation({
@@ -77,7 +77,7 @@ export default function ProfUpdateForm({ data }: { data: UserType }) {
             <Label>Email</Label>
             <Input readOnly value={data.email} />
           </div>
-          <FormField
+          {/* <FormField
             control={form.control}
             name="store_location"
             render={({ field }) => (
@@ -89,7 +89,7 @@ export default function ProfUpdateForm({ data }: { data: UserType }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <Button
             className="w-full !mt-6"
             type="submit"

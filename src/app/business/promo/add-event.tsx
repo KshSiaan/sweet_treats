@@ -49,9 +49,11 @@ const schema = z.object({
   type: z.string().min(1),
   event_date: z.string().min(1),
   starting_time: z.string().min(1),
+  ending_date: z.string().min(1),
+  // ending_time: z.string().min(1).optional(),
   description: z.string().min(1),
-  conference_link: z.string().optional(),
-  is_online: z.boolean(),
+  // conference_link: z.string().optional(),
+  // is_online: z.boolean(),
   location: z.string().optional(),
   target_products: z.array(z.string()).optional(),
 });
@@ -81,6 +83,7 @@ export default function AddEvent() {
     onSuccess: (res) => {
       toast.success(res.message ?? "Success!");
       qcl.invalidateQueries({ queryKey: ["events", token] });
+      form.reset();
     },
   });
 
@@ -92,13 +95,14 @@ export default function AddEvent() {
       event_date: "",
       starting_time: "",
       description: "",
-      is_online: false,
-      conference_link: "",
+      ending_date: "",
+      // is_online: false,
+      // conference_link: "",
       location: "",
       target_products: [],
     },
   });
-  const isOnline = form.watch("is_online");
+  // const isOnline = form.watch("is_online");
   const to12Hour = (time: string): string => {
     if (!time) return "";
 
@@ -115,26 +119,28 @@ export default function AddEvent() {
     formData.append("title", values.title);
     formData.append("type", values.type);
     formData.append("event_date", toDDMMYYYY(values.event_date));
+    formData.append("ending_date", toDDMMYYYY(values.ending_date));
     formData.append("starting_time", to12Hour(values.starting_time));
     formData.append("description", values.description);
-    formData.append("conference_link", values.conference_link ?? "");
+    // formData.append("conference_link", values.conference_link ?? "");
     formData.append("location", values.location ?? "");
 
-    formData.append("is_online", values.is_online ? "1" : "0");
+    // formData.append("is_online", values.is_online ? "1" : "0");
+    formData.append("is_online", "0");
 
-    if (!values.is_online && selectedProducts.length > 0) {
-      selectedProducts.forEach((id, index) => {
-        formData.append(`target_products[${index}]`, id);
-      });
-    }
+    // if (selectedProducts.length > 0) {
+    //   selectedProducts.forEach((id, index) => {
+    //     formData.append(`target_products[${index}]`, id);
+    //   });
+    // }
 
     if (files && files.length > 0) {
       formData.append("image", files[0]);
     }
     // 🔥 Console output exactly like you wanted
-    formData.forEach((value, key) => {
-      console.log(`${key}:${value}`);
-    });
+    // formData.forEach((value, key) => {
+    //   console.log(`${key}:${value}`);
+    // });
     mutate(formData);
   };
 
@@ -204,8 +210,18 @@ export default function AddEvent() {
               <Input type="time" {...form.register("starting_time")} />
             </div>
           </div>
+          <div className="grid gap-2">
+            <div className="space-y-2">
+              <Label>End Date</Label>
+              <Input type="date" {...form.register("ending_date")} />
+            </div>
+            {/* <div className="space-y-2">
+              <Label>Ending Time</Label>
+              <Input type="time" {...form.register("ending_time")} />
+            </div> */}
+          </div>
 
-          <Label>Event Venue</Label>
+          {/* <Label>Event Venue</Label>
           <RadioGroup
             className="flex gap-4"
             onValueChange={(v) => {
@@ -223,9 +239,9 @@ export default function AddEvent() {
               <RadioGroupItem value="no" id="no" className="border-primary" />
               <Label htmlFor="no">Online</Label>
             </div>
-          </RadioGroup>
+          </RadioGroup> */}
 
-          {isOnline && (
+          {/* {isOnline && (
             <>
               <Label>Conference Link</Label>
               <Input
@@ -233,16 +249,13 @@ export default function AddEvent() {
                 {...form.register("conference_link")}
               />
             </>
-          )}
-          {!isOnline && (
-            <>
-              <Label>Location</Label>
-              <Input
-                placeholder="Enter Location"
-                {...form.register("location")}
-              />
-            </>
-          )}
+          )} */}
+          {/* {!isOnline && ( */}
+          {/* <> */}
+          <Label>Location</Label>
+          <Input placeholder="Enter Location" {...form.register("location")} />
+          {/* </> */}
+          {/* )} */}
 
           <Label>Description</Label>
           <Textarea
