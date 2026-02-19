@@ -59,6 +59,7 @@ export default function Page() {
             <PaymentForm
               price={String(amount)}
               paymentId={paymentIntent ?? ""}
+              formData={formData}
             />
             {/* <span className="flex flex-row justify-start items-center gap-4 mt-6">
               <Checkbox id="terms" />

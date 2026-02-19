@@ -125,8 +125,7 @@ export default function PaymentForm({
         setIsLoading(false);
         return;
       }
-
-      toast.success("Payment successful 💸");
+      +toast.success("Payment successful 💸");
       mutate(formData);
       // ✅ hard redirect (guaranteed)
       window.location.href = "/employee/pos";
