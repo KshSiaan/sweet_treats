@@ -23,7 +23,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { set } from "zod";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +34,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { usePosInfo } from "@/lib/store/pos";
+import { createPaymentIntent } from "@/lib/api/global";
+import { useRouter } from "next/navigation";
 
 type CartItem = ProductType & {
   quantity: number;
@@ -43,6 +45,7 @@ type CartItem = ProductType & {
 
 export default function Store() {
   const [{ token }] = useCookies(["token"]);
+  const navig = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
   // 👇 MATCHES AddPromo PATTERN
   const [businessCategoryId, setBusinessCategoryId] = useState<string | null>(
@@ -171,7 +174,7 @@ export default function Store() {
     }));
   };
 
-  function handleSubmitOrder() {
+  async function handleSubmitOrder() {
     const subTotal = cart.reduce(
       (acc, item) => acc + parseFloat(item.price) * item.quantity,
       0,
@@ -201,7 +204,28 @@ export default function Store() {
       })),
       payment_method: paymentMethod === "card" ? "Card" : "Cash",
     };
-    mutate(payload);
+
+    if (paymentMethod === "card") {
+      const res = await createPaymentIntent(token, {
+        amount: payload.amount_info.total_amount,
+        payment_method_types: "card",
+      });
+
+      if (!res.status) {
+        toast.error(res.message || "Failed to create payment intent");
+        return;
+      }
+
+      usePosInfo.getState().setPaymentInfo({
+        formData: payload,
+        amount: payload.amount_info.total_amount * 100, // convert to cents
+        clientSecret: res?.data?.client_secret,
+        paymentIntent: res.data?.id,
+      });
+      navig.push("/employee/pos/pay");
+    } else {
+      mutate(payload);
+    }
   }
 
   return (

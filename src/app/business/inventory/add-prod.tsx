@@ -41,6 +41,7 @@ const addItemSchema = z.object({
   product_category_id: z.string().min(1, "Category is required"),
   product_name: z.string().min(1, "Product name is required"),
   price: z.string().optional(),
+  // currency: z.string().optional(),
   unit: z.string().optional(),
   stock: z.string().optional(),
   availability: z.string().optional(),
@@ -76,6 +77,7 @@ export default function AddProd() {
       product_category_id: "",
       stock: "",
       price: "",
+      // currency: "USD",
       unit: "",
       description: "",
       availability: "Available",
@@ -257,7 +259,18 @@ export default function AddProd() {
               />
             </div>
           </div>
-
+          <div>
+            <Label>Currency</Label>
+            <Select defaultValue="USD">
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD</SelectItem>
+                <SelectItem value="GYD">GYD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           {unit !== "" ? (
             <div>
               <Label>Availablity</Label>

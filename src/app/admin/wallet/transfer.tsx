@@ -87,12 +87,8 @@ export default function Transfer() {
 
   return (
     <Dialog>
-      <DialogTrigger disabled asChild>
-        <Button
-          // disabled={isPending}
-          disabled
-          variant={"outline"}
-        >
+      <DialogTrigger asChild>
+        <Button disabled={isPending} variant={"outline"}>
           <PlusIcon />
           Transfer
         </Button>

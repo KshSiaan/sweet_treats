@@ -85,8 +85,8 @@ export default function Deposit() {
 
   return (
     <Dialog>
-      <DialogTrigger disabled asChild>
-        <Button disabled>
+      <DialogTrigger asChild>
+        <Button>
           <PlusIcon />
           Deposit
         </Button>
